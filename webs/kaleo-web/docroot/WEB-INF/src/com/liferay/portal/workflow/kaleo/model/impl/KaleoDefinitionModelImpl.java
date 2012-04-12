@@ -371,8 +371,8 @@ public class KaleoDefinitionModelImpl extends BaseModelImpl<KaleoDefinition>
 			return;
 		}
 
-		setTitle(LocalizationUtil.updateLocalizationXmlFromMap(titleMap,
-				getTitle(), "Title", LocaleUtil.toLanguageId(defaultLocale)));
+		setTitle(LocalizationUtil.updateLocalization(titleMap, getTitle(),
+				"Title", LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON

@@ -384,8 +384,8 @@ public class CalendarEventModelImpl extends BaseModelImpl<CalendarEvent>
 			return;
 		}
 
-		setTitle(LocalizationUtil.updateLocalizationXmlFromMap(titleMap,
-				getTitle(), "Title", LocaleUtil.toLanguageId(defaultLocale)));
+		setTitle(LocalizationUtil.updateLocalization(titleMap, getTitle(),
+				"Title", LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -472,8 +472,8 @@ public class CalendarEventModelImpl extends BaseModelImpl<CalendarEvent>
 			return;
 		}
 
-		setDescription(LocalizationUtil.updateLocalizationXmlFromMap(
-				descriptionMap, getDescription(), "Description",
+		setDescription(LocalizationUtil.updateLocalization(descriptionMap,
+				getDescription(), "Description",
 				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 

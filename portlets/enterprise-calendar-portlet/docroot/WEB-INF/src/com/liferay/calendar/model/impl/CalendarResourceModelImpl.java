@@ -529,8 +529,8 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 			return;
 		}
 
-		setName(LocalizationUtil.updateLocalizationXmlFromMap(nameMap,
-				getName(), "Name", LocaleUtil.toLanguageId(defaultLocale)));
+		setName(LocalizationUtil.updateLocalization(nameMap, getName(), "Name",
+				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	public String getOriginalName() {
@@ -621,8 +621,8 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 			return;
 		}
 
-		setDescription(LocalizationUtil.updateLocalizationXmlFromMap(
-				descriptionMap, getDescription(), "Description",
+		setDescription(LocalizationUtil.updateLocalization(descriptionMap,
+				getDescription(), "Description",
 				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 

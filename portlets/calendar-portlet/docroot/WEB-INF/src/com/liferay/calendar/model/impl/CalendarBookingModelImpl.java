@@ -503,8 +503,8 @@ public class CalendarBookingModelImpl extends BaseModelImpl<CalendarBooking>
 			return;
 		}
 
-		setTitle(LocalizationUtil.updateLocalizationXmlFromMap(titleMap,
-				getTitle(), "Title", LocaleUtil.toLanguageId(defaultLocale)));
+		setTitle(LocalizationUtil.updateLocalization(titleMap, getTitle(),
+				"Title", LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -588,8 +588,8 @@ public class CalendarBookingModelImpl extends BaseModelImpl<CalendarBooking>
 			return;
 		}
 
-		setName(LocalizationUtil.updateLocalizationXmlFromMap(nameMap,
-				getName(), "Name", LocaleUtil.toLanguageId(defaultLocale)));
+		setName(LocalizationUtil.updateLocalization(nameMap, getName(), "Name",
+				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -676,8 +676,8 @@ public class CalendarBookingModelImpl extends BaseModelImpl<CalendarBooking>
 			return;
 		}
 
-		setDescription(LocalizationUtil.updateLocalizationXmlFromMap(
-				descriptionMap, getDescription(), "Description",
+		setDescription(LocalizationUtil.updateLocalization(descriptionMap,
+				getDescription(), "Description",
 				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
