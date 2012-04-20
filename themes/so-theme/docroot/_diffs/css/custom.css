@@ -1055,7 +1055,6 @@ input[type=submit], input[type=button], input[type=reset], .aui-state-hover, .co
 
 	h1.header-title, #blogsCommentsPanelContainer, .aui-form, .entry {
 		margin: 0 auto;
-		max-width: 640px;
 	}
 
 	h1.header-title, .entry-title h2 {
@@ -1077,9 +1076,6 @@ input[type=submit], input[type=button], input[type=reset], .aui-state-hover, .co
 		background-color: rgba(255, 255, 255, .8);
 		margin: 0;
 		padding: 4px;
-		position: absolute;
-		right: 0;
-		top: 0;
 	}
 
 	#_33_fm .aui-fieldset {
