@@ -87,9 +87,7 @@ else {
 
 			ExpandoBridge expandoBridge = group.getExpandoBridge();
 
-			boolean socialOfficeEnabled = SocialOfficeServiceUtil.isSocialOfficeSite(group.getGroupId());
-
-			if (socialOfficeEnabled) {
+			if (SocialOfficeServiceUtil.isSocialOfficeGroup(group.getGroupId())) {
 				classNames += "social-office-enabled ";
 			}
 
@@ -273,7 +271,7 @@ else {
 
 		if (results.length == 0) {
 			buffer.push(
-				'<li class="empty"><liferay-ui:message key="there-are-no-results" /></li>'
+				'<li class="empty"><liferay-ui:message key="there-are-no-results" unicode="<%= true %>" /></li>'
 			);
 		}
 		else {
@@ -294,7 +292,7 @@ else {
 						var classNames = [];
 						var joinHtml = '';
 
-						if (result.socialOfficeEnabled) {
+						if (result.socialOfficeGroup) {
 							classNames.push('social-office-enabled');
 						}
 
@@ -446,6 +444,12 @@ else {
 									siteName.insert(siteAction, 'replace');
 
 									setTimeout("Liferay.SO.Sites.updateSites();", 2000);
+
+									<c:if test="<%= themeDisplay.isStatePopUp() %>">
+										if (window.parent) {
+											Liferay.Util.getOpener().Liferay.Portlet.refresh('#p_p_id_5_WAR_soportlet_');
+										}
+									</c:if>
 								}
 							}
 						}
@@ -459,6 +463,12 @@ else {
 						after: {
 							success: function(event, id, obj) {
 								Liferay.SO.Sites.updateSites();
+
+								<c:if test="<%= themeDisplay.isStatePopUp() %>">
+									if (window.parent) {
+										Liferay.Util.getOpener().Liferay.Portlet.refresh('#p_p_id_5_WAR_soportlet_');
+									}
+								</c:if>
 							}
 						}
 					}
@@ -467,4 +477,20 @@ else {
 		},
 		'.action a'
 	);
+
+	<c:if test="<%= themeDisplay.isStatePopUp() %>">
+		directoryContainer.one('.directory-list').delegate(
+			'click',
+			function(event) {
+				if (window.parent) {
+					event.preventDefault();
+
+					var uri = event.currentTarget.getAttribute('href');
+
+					Liferay.Util.getOpener().location.href = uri;
+				}
+			},
+			'.name a'
+		);
+	</c:if>
 </aui:script>

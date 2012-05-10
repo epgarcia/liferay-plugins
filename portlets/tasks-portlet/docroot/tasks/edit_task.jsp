@@ -63,7 +63,7 @@ if ((tasksEntry != null) && (tasksEntry.getDueDate() != null)) {
 				<c:otherwise>
 					<aui:option label="" selected="<%= (assigneeUserId == 0) %>" value="0" />
 
-					<aui:option label="<%= HtmlUtil.escape(user.getFullName()) %>" selected="<%= (assigneeUserId == user.getUserId()) %>" />
+					<aui:option label="<%= HtmlUtil.escape(user.getFullName()) %>" selected="<%= (assigneeUserId == user.getUserId()) %>" value="<%= user.getUserId() %>" />
 
 					<c:if test="<%= (tasksEntry != null) && (assigneeUserId > 0) && (assigneeUserId != user.getUserId()) %>">
 						<aui:option label="<%= PortalUtil.getUserName(assigneeUserId, tasksEntry.getAssigneeFullName()) %>" selected="<%= true %>" value="<%= assigneeUserId %>" />
@@ -77,7 +77,7 @@ if ((tasksEntry != null) && (tasksEntry.getDueDate() != null)) {
 			List<User> users = null;
 
 			if (group.isUser()) {
-				users = UserLocalServiceUtil.getSocialUsers(group.getClassPK(), QueryUtil.ALL_POS, QueryUtil.ALL_POS, new ContactFirstNameComparator(true));
+				users = UserLocalServiceUtil.getSocialUsers(group.getClassPK(), SocialRelationConstants.TYPE_BI_CONNECTION, QueryUtil.ALL_POS, QueryUtil.ALL_POS, new ContactFirstNameComparator(true));
 			}
 			else {
 				LinkedHashMap userParams = new LinkedHashMap();
@@ -125,7 +125,7 @@ if ((tasksEntry != null) && (tasksEntry.getDueDate() != null)) {
 				for (int curStatus : TasksEntryConstants.STATUSES) {
 				%>
 
-					<aui:option label="<%= TasksEntryConstants.getStatusLabel(curStatus) %>" selected="<%= tasksEntry.getStatus() == curStatus %>" />
+					<aui:option label="<%= TasksEntryConstants.getStatusLabel(curStatus) %>" selected="<%= tasksEntry.getStatus() == curStatus %>" value="<%= curStatus %>" />
 
 				<%
 				}

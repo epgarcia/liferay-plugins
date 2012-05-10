@@ -85,6 +85,10 @@ public class MemberRequestLocalServiceWrapper
 		return _memberRequestLocalService.deleteMemberRequest(memberRequest);
 	}
 
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _memberRequestLocalService.dynamicQuery();
+	}
+
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
 	*
@@ -259,33 +263,42 @@ public class MemberRequestLocalServiceWrapper
 		_memberRequestLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
+	public java.lang.Object invokeMethod(java.lang.String name,
+		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
+		throws java.lang.Throwable {
+		return _memberRequestLocalService.invokeMethod(name, parameterTypes,
+			arguments);
+	}
+
 	public com.liferay.so.model.MemberRequest addMemberRequest(long userId,
 		long groupId, long receiverUserId,
 		java.lang.String receiverEmailAddress, long invitedRoleId,
-		long invitedTeamId, com.liferay.portal.theme.ThemeDisplay themeDisplay)
+		long invitedTeamId,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _memberRequestLocalService.addMemberRequest(userId, groupId,
 			receiverUserId, receiverEmailAddress, invitedRoleId, invitedTeamId,
-			themeDisplay);
+			serviceContext);
 	}
 
 	public void addMemberRequests(long userId, long groupId,
 		long[] receiverUserIds, long invitedRoleId, long invitedTeamId,
-		com.liferay.portal.theme.ThemeDisplay themeDisplay)
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_memberRequestLocalService.addMemberRequests(userId, groupId,
-			receiverUserIds, invitedRoleId, invitedTeamId, themeDisplay);
+			receiverUserIds, invitedRoleId, invitedTeamId, serviceContext);
 	}
 
 	public void addMemberRequests(long userId, long groupId,
 		java.lang.String[] emailAddresses, long invitedRoleId,
-		long invitedTeamId, com.liferay.portal.theme.ThemeDisplay themeDisplay)
+		long invitedTeamId,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_memberRequestLocalService.addMemberRequests(userId, groupId,
-			emailAddresses, invitedRoleId, invitedTeamId, themeDisplay);
+			emailAddresses, invitedRoleId, invitedTeamId, serviceContext);
 	}
 
 	public com.liferay.so.model.MemberRequest getMemberRequest(long groupId,

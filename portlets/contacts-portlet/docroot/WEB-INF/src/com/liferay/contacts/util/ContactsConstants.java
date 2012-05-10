@@ -31,11 +31,14 @@ public class ContactsConstants {
 
 	public static final String DISPLAY_STYLE_FULL_LABEL = "full";
 
-	public static final String FILTER_BY_GROUP = "group_";
-
 	public static final String FILTER_BY_DEFAULT = "default";
 
+	public static final String FILTER_BY_GROUP = "group_";
+
 	public static final String FILTER_BY_TYPE = "type_";
+
+	public static final String FILTER_BY_TYPE_BI_CONNECTION =
+		FILTER_BY_TYPE + SocialRelationConstants.TYPE_BI_CONNECTION;
 
 	public static final String FILTER_BY_TYPE_MY_CONTACTS =
 		FILTER_BY_TYPE + SocialRelationConstants.TYPE_MY_CONTACTS;
@@ -43,8 +46,7 @@ public class ContactsConstants {
 	public static final String FILTER_BY_TYPE_UNI_FOLLOWER =
 		FILTER_BY_TYPE + SocialRelationConstants.TYPE_UNI_FOLLOWER;
 
-	public static final String FILTER_BY_TYPE_BI_CONNECTION =
-		FILTER_BY_TYPE + SocialRelationConstants.TYPE_BI_CONNECTION;
+	public static final int MAX_RESULT_COUNT = 100;
 
 	public static String getDisplayStyleLabel(int displayStyle) {
 		if (displayStyle == DISPLAY_STYLE_BASIC) {

@@ -36,7 +36,7 @@ request.setAttribute("view_user.jsp-user", user2);
 %>
 
 <c:if test="<%= user2 != null %>">
-	<div class="contacts-profile <%= (user.getUserId() == user2.getUserId()) ? "my-profile" : StringPool.BLANK %>">
+	<div class="contacts-profile <%= (user.getUserId() == user2.getUserId()) ? "my-profile" : StringPool.BLANK %>" id="<portlet:namespace />contactsProfile">
 		<c:if test="<%= (displayStyle == ContactsConstants.DISPLAY_STYLE_BASIC) || (displayStyle == ContactsConstants.DISPLAY_STYLE_FULL) %>">
 			<aui:layout cssClass="social-relations">
 
@@ -81,44 +81,40 @@ request.setAttribute("view_user.jsp-user", user2);
 							else if (SocialRelationLocalServiceUtil.hasRelation(themeDisplay.getUserId(), user2.getUserId(), SocialRelationConstants.TYPE_UNI_ENEMY)) {
 								blocked = true;
 							}
+
+							boolean showConnectedRequestedIcon = !blocked && SocialRequestLocalServiceUtil.hasRequest(themeDisplay.getUserId(), User.class.getName(), themeDisplay.getUserId(), SocialRelationConstants.TYPE_BI_CONNECTION, user2.getUserId(), SocialRequestConstants.STATUS_PENDING);
+							boolean showConnectedIcon = !blocked && SocialRelationLocalServiceUtil.hasRelation(themeDisplay.getUserId(), user2.getUserId(), SocialRelationConstants.TYPE_BI_CONNECTION);
+							boolean showFollowingIcon = !blocked && SocialRelationLocalServiceUtil.hasRelation(themeDisplay.getUserId(), user2.getUserId(), SocialRelationConstants.TYPE_UNI_FOLLOWER);
+							boolean showBlockIcon = SocialRelationLocalServiceUtil.hasRelation(themeDisplay.getUserId(), user2.getUserId(), SocialRelationConstants.TYPE_UNI_ENEMY);
 							%>
 
-							<c:choose>
-								<c:when test="<%= !blocked && SocialRequestLocalServiceUtil.hasRequest(themeDisplay.getUserId(), User.class.getName(), themeDisplay.getUserId(), SocialRelationConstants.TYPE_BI_CONNECTION, user2.getUserId(), SocialRequestConstants.STATUS_PENDING) %>">
-									<liferay-ui:icon
-										cssClass="disabled"
-										image="../social/coworker"
-										label="<%= true %>"
-										message="connection-requested"
-									/>
-								</c:when>
-								<c:when test="<%= !blocked && SocialRelationLocalServiceUtil.hasRelation(themeDisplay.getUserId(), user2.getUserId(), SocialRelationConstants.TYPE_BI_CONNECTION) %>">
-									<liferay-ui:icon
-										cssClass="connected"
-										image="../social/coworker"
-										label="<%= true %>"
-										message="connected"
-									/>
-								</c:when>
-							</c:choose>
+							<liferay-ui:icon
+								cssClass='<%= showConnectedRequestedIcon ? "disabled" : "disabled aui-helper-hidden" %>'
+								image="../social/coworker"
+								label="<%= true %>"
+								message="connection-requested"
+							/>
 
-							<c:if test="<%= !blocked && SocialRelationLocalServiceUtil.hasRelation(themeDisplay.getUserId(), user2.getUserId(), SocialRelationConstants.TYPE_UNI_FOLLOWER) %>">
-								<liferay-ui:icon
-									cssClass="following"
-									image="../social/following"
-									label="<%= true %>"
-									message="following"
-								/>
-							</c:if>
+							<liferay-ui:icon
+								cssClass='<%= showConnectedIcon ? "connected" : "connected aui-helper-hidden" %>'
+								image="../social/coworker"
+								label="<%= true %>"
+								message="connected"
+							/>
 
-							<c:if test="<%= SocialRelationLocalServiceUtil.hasRelation(themeDisplay.getUserId(), user2.getUserId(), SocialRelationConstants.TYPE_UNI_ENEMY) %>">
-								<liferay-ui:icon
-									cssClass="block"
-									image="../social/block"
-									label="<%= true %>"
-									message="block"
-								/>
-							</c:if>
+							<liferay-ui:icon
+								cssClass='<%= showFollowingIcon ? "following" : "following aui-helper-hidden" %>'
+								image="../social/following"
+								label="<%= true %>"
+								message="following"
+							/>
+
+							<liferay-ui:icon
+								cssClass='<%= showBlockIcon ? "block" : "block aui-helper-hidden" %>'
+								image="../social/block"
+								label="<%= true %>"
+								message="block"
+							/>
 						</c:when>
 						<c:otherwise>
 							<liferay-util:include page="/contacts_center/user_toolbar.jsp" servletContext="<%= application %>" />
@@ -127,24 +123,24 @@ request.setAttribute("view_user.jsp-user", user2);
 				</aui:layout>
 			</aui:layout>
 
-			<div class="lfr-detail-info">
+			<div class="lfr-detail-info field-group" data-sectionId="details" data-title="<%= LanguageUtil.get(pageContext, "details") %>">
 				<c:if test="<%= showIcon %>">
 					<div class="lfr-contact-thumb">
-						<a href="<%= user2.getDisplayURL(themeDisplay) %>"><img alt="<%= HtmlUtil.escape(user2.getFullName()) %>" src="<%= user2.getPortraitURL(themeDisplay) %>" /></a>
+						<a href="<%= user2.getDisplayURL(themeDisplay) %>"><img alt="<%= user2.getFullName() %>" src="<%= user2.getPortraitURL(themeDisplay) %>" /></a>
 					</div>
 				</c:if>
 
 				<div class="<%= showIcon ? StringPool.BLANK : "no-icon" %> lfr-contact-info">
 					<div class="lfr-contact-name">
-						<a href="<%= user2.getDisplayURL(themeDisplay) %>"><%= HtmlUtil.escape(user2.getFullName()) %></a>
+						<a href="<%= user2.getDisplayURL(themeDisplay) %>"><%= user2.getFullName() %></a>
 					</div>
 
 					<div class="lfr-contact-job-title">
-						<%= HtmlUtil.escape(user2.getJobTitle()) %>
+						<%= user2.getJobTitle() %>
 					</div>
 
 					<div class="lfr-contact-extra">
-						<%= HtmlUtil.escape(user2.getEmailAddress()) %>
+						<a href="mailto:<%= user2.getEmailAddress() %>"><%= user2.getEmailAddress() %></a>
 					</div>
 				</div>
 
@@ -274,7 +270,7 @@ request.setAttribute("view_user.jsp-user", user2);
 
 								<c:choose>
 									<c:when test="<%= !assetTags.isEmpty() %>">
-										<div class="field-group" data-sectionId="categorization" data-title="<%= LanguageUtil.get(pageContext, "tags") %>">
+										<div class="field-group" data-sectionId="categorization" data-title="<%= UnicodeLanguageUtil.get(pageContext, "tags") %>">
 											<ul class="user-tags">
 
 												<%
@@ -330,11 +326,11 @@ request.setAttribute("view_user.jsp-user", user2);
 	</div>
 </c:if>
 
-<c:if test="<%= (themeDisplay.getUserId() == user2.getUserId()) && (showCompleteYourProfile || showUsersInformation || showTags) && ((displayStyle == ContactsConstants.DISPLAY_STYLE_DETAIL) || (displayStyle == ContactsConstants.DISPLAY_STYLE_FULL)) && UserPermissionUtil.contains(permissionChecker, user2.getUserId(), ActionKeys.VIEW) %>">
+<c:if test="<%= themeDisplay.getUserId() == user2.getUserId() %>">
 	<aui:script use="aui-base">
-			var userInformation = A.one('#<portlet:namespace />userInformation');
+			var contactsProfile = A.one('#<portlet:namespace />contactsProfile');
 
-			userInformation.delegate(
+			contactsProfile.delegate(
 				'click',
 				function(event) {
 					var node = event.target;
@@ -351,7 +347,7 @@ request.setAttribute("view_user.jsp-user", user2);
 			var <portlet:namespace />openDialog = function(event) {
 				var node = event.currentTarget;
 
-				var uri = '<portlet:renderURL windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="mvcPath" value="/contacts_center/edit_user_dialogs.jsp" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:renderURL>';
+				var uri = '<portlet:renderURL windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="mvcPath" value="/contacts_center/edit_user_dialogs.jsp" /></portlet:renderURL>';
 
 				if (node.getAttribute('data-sectionId')) {
 					uri = Liferay.Util.addParams('curSectionId=' + node.getAttribute('data-sectionId'), uri) || uri;
@@ -363,7 +359,10 @@ request.setAttribute("view_user.jsp-user", user2);
 
 				var dialog = new A.Dialog(
 					{
-						centered: true,
+						align: {
+							node: null,
+							points: ['tc', 'tc']
+						},
 						constrain2view: true,
 						cssClass: 'profile-dialog',
 						destroyOnClose: true,
