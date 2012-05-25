@@ -15,7 +15,7 @@
 package com.liferay.calendar.service;
 
 import com.liferay.calendar.model.CalendarBookingClp;
-import com.liferay.calendar.model.CalendarEventClp;
+import com.liferay.calendar.model.CalendarClp;
 import com.liferay.calendar.model.CalendarResourceClp;
 
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
@@ -105,12 +105,12 @@ public class ClpSerializer {
 
 		String oldModelClassName = oldModelClass.getName();
 
-		if (oldModelClassName.equals(CalendarBookingClp.class.getName())) {
-			return translateInputCalendarBooking(oldModel);
+		if (oldModelClassName.equals(CalendarClp.class.getName())) {
+			return translateInputCalendar(oldModel);
 		}
 
-		if (oldModelClassName.equals(CalendarEventClp.class.getName())) {
-			return translateInputCalendarEvent(oldModel);
+		if (oldModelClassName.equals(CalendarBookingClp.class.getName())) {
+			return translateInputCalendarBooking(oldModel);
 		}
 
 		if (oldModelClassName.equals(CalendarResourceClp.class.getName())) {
@@ -132,20 +132,20 @@ public class ClpSerializer {
 		return newList;
 	}
 
-	public static Object translateInputCalendarBooking(BaseModel<?> oldModel) {
-		CalendarBookingClp oldClpModel = (CalendarBookingClp)oldModel;
+	public static Object translateInputCalendar(BaseModel<?> oldModel) {
+		CalendarClp oldClpModel = (CalendarClp)oldModel;
 
-		BaseModel<?> newModel = oldClpModel.getCalendarBookingRemoteModel();
+		BaseModel<?> newModel = oldClpModel.getCalendarRemoteModel();
 
 		newModel.setModelAttributes(oldClpModel.getModelAttributes());
 
 		return newModel;
 	}
 
-	public static Object translateInputCalendarEvent(BaseModel<?> oldModel) {
-		CalendarEventClp oldClpModel = (CalendarEventClp)oldModel;
+	public static Object translateInputCalendarBooking(BaseModel<?> oldModel) {
+		CalendarBookingClp oldClpModel = (CalendarBookingClp)oldModel;
 
-		BaseModel<?> newModel = oldClpModel.getCalendarEventRemoteModel();
+		BaseModel<?> newModel = oldClpModel.getCalendarBookingRemoteModel();
 
 		newModel.setModelAttributes(oldClpModel.getModelAttributes());
 
@@ -180,13 +180,13 @@ public class ClpSerializer {
 		String oldModelClassName = oldModelClass.getName();
 
 		if (oldModelClassName.equals(
-					"com.liferay.calendar.model.impl.CalendarBookingImpl")) {
-			return translateOutputCalendarBooking(oldModel);
+					"com.liferay.calendar.model.impl.CalendarImpl")) {
+			return translateOutputCalendar(oldModel);
 		}
 
 		if (oldModelClassName.equals(
-					"com.liferay.calendar.model.impl.CalendarEventImpl")) {
-			return translateOutputCalendarEvent(oldModel);
+					"com.liferay.calendar.model.impl.CalendarBookingImpl")) {
+			return translateOutputCalendarBooking(oldModel);
 		}
 
 		if (oldModelClassName.equals(
@@ -275,22 +275,27 @@ public class ClpSerializer {
 		}
 
 		if (className.equals(
-					"com.liferay.calendar.CalendarEventDurationException")) {
-			return new com.liferay.calendar.CalendarEventDurationException();
+					"com.liferay.calendar.CalendarBookingDurationException")) {
+			return new com.liferay.calendar.CalendarBookingDurationException();
 		}
 
 		if (className.equals(
-					"com.liferay.calendar.CalendarEventEndDateException")) {
-			return new com.liferay.calendar.CalendarEventEndDateException();
+					"com.liferay.calendar.CalendarBookingEndDateException")) {
+			return new com.liferay.calendar.CalendarBookingEndDateException();
 		}
 
 		if (className.equals(
-					"com.liferay.calendar.CalendarEventStartDateException")) {
-			return new com.liferay.calendar.CalendarEventStartDateException();
+					"com.liferay.calendar.CalendarBookingStartDateException")) {
+			return new com.liferay.calendar.CalendarBookingStartDateException();
 		}
 
-		if (className.equals("com.liferay.calendar.CalendarEventTitleException")) {
-			return new com.liferay.calendar.CalendarEventTitleException();
+		if (className.equals(
+					"com.liferay.calendar.CalendarBookingTitleException")) {
+			return new com.liferay.calendar.CalendarBookingTitleException();
+		}
+
+		if (className.equals("com.liferay.calendar.CalendarNameException")) {
+			return new com.liferay.calendar.CalendarNameException();
 		}
 
 		if (className.equals(
@@ -298,12 +303,12 @@ public class ClpSerializer {
 			return new com.liferay.calendar.DuplicateCalendarResourceException();
 		}
 
-		if (className.equals("com.liferay.calendar.NoSuchBookingException")) {
-			return new com.liferay.calendar.NoSuchBookingException();
+		if (className.equals("com.liferay.calendar.NoSuchCalendarException")) {
+			return new com.liferay.calendar.NoSuchCalendarException();
 		}
 
-		if (className.equals("com.liferay.calendar.NoSuchEventException")) {
-			return new com.liferay.calendar.NoSuchEventException();
+		if (className.equals("com.liferay.calendar.NoSuchBookingException")) {
+			return new com.liferay.calendar.NoSuchBookingException();
 		}
 
 		if (className.equals("com.liferay.calendar.NoSuchResourceException")) {
@@ -313,22 +318,22 @@ public class ClpSerializer {
 		return throwable;
 	}
 
+	public static Object translateOutputCalendar(BaseModel<?> oldModel) {
+		CalendarClp newModel = new CalendarClp();
+
+		newModel.setModelAttributes(oldModel.getModelAttributes());
+
+		newModel.setCalendarRemoteModel(oldModel);
+
+		return newModel;
+	}
+
 	public static Object translateOutputCalendarBooking(BaseModel<?> oldModel) {
 		CalendarBookingClp newModel = new CalendarBookingClp();
 
 		newModel.setModelAttributes(oldModel.getModelAttributes());
 
 		newModel.setCalendarBookingRemoteModel(oldModel);
-
-		return newModel;
-	}
-
-	public static Object translateOutputCalendarEvent(BaseModel<?> oldModel) {
-		CalendarEventClp newModel = new CalendarEventClp();
-
-		newModel.setModelAttributes(oldModel.getModelAttributes());
-
-		newModel.setCalendarEventRemoteModel(oldModel);
 
 		return newModel;
 	}

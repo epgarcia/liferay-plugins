@@ -502,7 +502,7 @@ public class FileSystemImporter extends BaseImporter {
 			matcher.reset(content);
 		}
 
-		if (content.contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
+		if (content.contains("<?xml version=\"1.0\"")) {
 			return content;
 		}
 

@@ -54,11 +54,15 @@ public class CalendarResourceWrapper implements CalendarResource,
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("resourceBlockId", getResourceBlockId());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
 		attributes.put("classUuid", getClassUuid());
+		attributes.put("defaultCalendarId", getDefaultCalendarId());
+		attributes.put("code", getCode());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
+		attributes.put("type", getType());
 		attributes.put("active", getActive());
 
 		return attributes;
@@ -113,6 +117,12 @@ public class CalendarResourceWrapper implements CalendarResource,
 			setModifiedDate(modifiedDate);
 		}
 
+		Long resourceBlockId = (Long)attributes.get("resourceBlockId");
+
+		if (resourceBlockId != null) {
+			setResourceBlockId(resourceBlockId);
+		}
+
 		Long classNameId = (Long)attributes.get("classNameId");
 
 		if (classNameId != null) {
@@ -131,6 +141,18 @@ public class CalendarResourceWrapper implements CalendarResource,
 			setClassUuid(classUuid);
 		}
 
+		Long defaultCalendarId = (Long)attributes.get("defaultCalendarId");
+
+		if (defaultCalendarId != null) {
+			setDefaultCalendarId(defaultCalendarId);
+		}
+
+		String code = (String)attributes.get("code");
+
+		if (code != null) {
+			setCode(code);
+		}
+
 		String name = (String)attributes.get("name");
 
 		if (name != null) {
@@ -141,6 +163,12 @@ public class CalendarResourceWrapper implements CalendarResource,
 
 		if (description != null) {
 			setDescription(description);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
 		}
 
 		Boolean active = (Boolean)attributes.get("active");
@@ -333,6 +361,24 @@ public class CalendarResourceWrapper implements CalendarResource,
 	}
 
 	/**
+	* Returns the resource block ID of this calendar resource.
+	*
+	* @return the resource block ID of this calendar resource
+	*/
+	public long getResourceBlockId() {
+		return _calendarResource.getResourceBlockId();
+	}
+
+	/**
+	* Sets the resource block ID of this calendar resource.
+	*
+	* @param resourceBlockId the resource block ID of this calendar resource
+	*/
+	public void setResourceBlockId(long resourceBlockId) {
+		_calendarResource.setResourceBlockId(resourceBlockId);
+	}
+
+	/**
 	* Returns the fully qualified class name of this calendar resource.
 	*
 	* @return the fully qualified class name of this calendar resource
@@ -397,6 +443,42 @@ public class CalendarResourceWrapper implements CalendarResource,
 	*/
 	public void setClassUuid(java.lang.String classUuid) {
 		_calendarResource.setClassUuid(classUuid);
+	}
+
+	/**
+	* Returns the default calendar ID of this calendar resource.
+	*
+	* @return the default calendar ID of this calendar resource
+	*/
+	public long getDefaultCalendarId() {
+		return _calendarResource.getDefaultCalendarId();
+	}
+
+	/**
+	* Sets the default calendar ID of this calendar resource.
+	*
+	* @param defaultCalendarId the default calendar ID of this calendar resource
+	*/
+	public void setDefaultCalendarId(long defaultCalendarId) {
+		_calendarResource.setDefaultCalendarId(defaultCalendarId);
+	}
+
+	/**
+	* Returns the code of this calendar resource.
+	*
+	* @return the code of this calendar resource
+	*/
+	public java.lang.String getCode() {
+		return _calendarResource.getCode();
+	}
+
+	/**
+	* Sets the code of this calendar resource.
+	*
+	* @param code the code of this calendar resource
+	*/
+	public void setCode(java.lang.String code) {
+		_calendarResource.setCode(code);
 	}
 
 	/**
@@ -654,6 +736,24 @@ public class CalendarResourceWrapper implements CalendarResource,
 	}
 
 	/**
+	* Returns the type of this calendar resource.
+	*
+	* @return the type of this calendar resource
+	*/
+	public java.lang.String getType() {
+		return _calendarResource.getType();
+	}
+
+	/**
+	* Sets the type of this calendar resource.
+	*
+	* @param type the type of this calendar resource
+	*/
+	public void setType(java.lang.String type) {
+		_calendarResource.setType(type);
+	}
+
+	/**
 	* Returns the active of this calendar resource.
 	*
 	* @return the active of this calendar resource
@@ -752,6 +852,10 @@ public class CalendarResourceWrapper implements CalendarResource,
 	public void persist()
 		throws com.liferay.portal.kernel.exception.SystemException {
 		_calendarResource.persist();
+	}
+
+	public boolean isGlobal() {
+		return _calendarResource.isGlobal();
 	}
 
 	/**

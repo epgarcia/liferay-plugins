@@ -65,78 +65,120 @@ public interface CalendarBookingService extends BaseService, InvokableService {
 		throws java.lang.Throwable;
 
 	public com.liferay.calendar.model.CalendarBooking addCalendarBooking(
-		long calendarEventId, long calendarResourceId, boolean required,
+		long calendarId, long[] childCalendarIds, long parentCalendarBookingId,
+		java.util.Map<java.util.Locale, java.lang.String> titleMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.lang.String location, java.util.Date startDate,
+		java.util.Date endDate, boolean allDay, java.lang.String recurrence,
+		int firstReminder, int secondReminder,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	public com.liferay.calendar.model.CalendarBooking deleteCalendarBooking(
-		long calendarResourceId, long calendarBookingId)
+		long calendarBookingId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.calendar.model.CalendarBooking fetchCalendarBooking(
+		long calendarBookingId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.calendar.model.CalendarBooking getCalendarBooking(
-		long calendarResourceId, long calendarBookingId)
+		long calendarBookingId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.calendar.model.CalendarBooking getCalendarBooking(
+		long calendarId, long parentCalendarBookingId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.calendar.model.CalendarBooking> getCalendarBookings(
-		java.lang.String className, long classPK, long calendarResourceId,
-		int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		long calendarId, java.util.Date startDate, java.util.Date endDate)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getCalendarBookingsCount(java.lang.String className,
-		long classPK, long calendarResourceId)
+	public java.util.List<com.liferay.calendar.model.CalendarBooking> getChildCalendarBookings(
+		long parentCalendarBookingId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.calendar.model.CalendarBooking> getCalendarEventCalendarBookings(
-		long calendarEventId, long calendarResourceId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+	public java.util.List<com.liferay.calendar.model.CalendarBooking> getChildCalendarBookings(
+		long parentCalendarBookingId, int status)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getCalendarEventCalendarBookingsCount(long calendarEventId,
-		long calendarResourceId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.calendar.model.CalendarBooking> getCalendarResourceCalendarBookings(
-		long calendarResourceId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getCalendarResourceCalendarBookingsCount(long calendarResourceId)
+	public void invokeTransition(long calendarBookingId,
+		java.lang.String transitionName,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.calendar.model.CalendarBooking> search(
-		long calendarResourceId, java.lang.String title,
-		java.lang.String description, java.lang.String type,
-		boolean andOperator, int start, int end,
+		long companyId, long[] groupIds, long[] calendarIds,
+		long[] calendarResourceIds, long parentCalendarBookingId,
+		java.lang.String keywords, java.util.Date startDate,
+		java.util.Date endDate, int[] statuses, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(long calendarResourceId, java.lang.String title,
-		java.lang.String description, java.lang.String type, boolean andOperator)
+	public java.util.List<com.liferay.calendar.model.CalendarBooking> search(
+		long companyId, long[] groupIds, long[] calendarIds,
+		long[] calendarResourceIds, long parentCalendarBookingId,
+		java.lang.String title, java.lang.String description,
+		java.lang.String location, java.util.Date startDate,
+		java.util.Date endDate, int[] statuses, boolean andOperator, int start,
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int searchCount(long companyId, long[] groupIds, long[] calendarIds,
+		long[] calendarResourceIds, long parentCalendarBookingId,
+		java.lang.String keywords, java.util.Date startDate,
+		java.util.Date endDate, int[] statuses)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int searchCount(long companyId, long[] groupIds, long[] calendarIds,
+		long[] calendarResourceIds, long parentCalendarBookingId,
+		java.lang.String title, java.lang.String description,
+		java.lang.String location, java.util.Date startDate,
+		java.util.Date endDate, int[] statuses, boolean andOperator)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	public com.liferay.calendar.model.CalendarBooking updateCalendarBooking(
-		long calendarResourceId, long calendarBookingId, int status,
+		long calendarBookingId, long calendarId, long[] childCalendarIds,
+		java.util.Map<java.util.Locale, java.lang.String> titleMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.lang.String location, java.util.Date startDate,
+		java.util.Date endDate, boolean allDay, java.lang.String recurrence,
+		int firstReminder, int secondReminder, int status,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.calendar.model.CalendarBooking updateCalendarBooking(
+		long calendarBookingId, long calendarId,
+		java.util.Map<java.util.Locale, java.lang.String> titleMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.lang.String location, java.util.Date startDate,
+		java.util.Date endDate, boolean allDay, java.lang.String recurrence,
+		int firstReminder, int secondReminder, int status,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
