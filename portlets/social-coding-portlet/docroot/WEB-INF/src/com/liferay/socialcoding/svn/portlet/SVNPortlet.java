@@ -85,6 +85,13 @@ public class SVNPortlet extends MVCPortlet {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 			throws Exception {
 
+		if (!PortalUtil.isRSSFeedsEnabled()) {
+			PortalUtil.sendRSSFeedsDisabledError(
+				resourceRequest, resourceResponse);
+
+			return;
+		}
+
 		String rss = getRSS(resourceRequest, 100);
 
 		PortletResponseUtil.sendFile(
