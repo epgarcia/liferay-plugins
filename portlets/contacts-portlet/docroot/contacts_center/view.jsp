@@ -94,7 +94,7 @@ portletURL.setWindowState(WindowState.NORMAL);
 								<aui:option label="all" selected="<%= filterBy.equals(ContactsConstants.FILTER_BY_DEFAULT) %>" value="<%= ContactsConstants.FILTER_BY_DEFAULT %>" />
 
 								<c:if test="<%= showOnlySiteMembers %>">
-									<aui:option label="admins" selected="<%= filterBy.equals(ContactsConstants.FILTER_BY_ADMINS) %>" value="<%= ContactsConstants.FILTER_BY_ADMINS %>" />
+									<aui:option label="administrators" selected="<%= filterBy.equals(ContactsConstants.FILTER_BY_ADMINS) %>" value="<%= ContactsConstants.FILTER_BY_ADMINS %>" />
 								</c:if>
 
 								<aui:option label="connections" selected="<%= filterBy.equals(ContactsConstants.FILTER_BY_TYPE_BI_CONNECTION) %>" value="<%= ContactsConstants.FILTER_BY_TYPE_BI_CONNECTION %>" />
@@ -129,9 +129,11 @@ portletURL.setWindowState(WindowState.NORMAL);
 				</div>
 
 				<c:if test="<%= !showOnlySiteMembers %>">
-					<div class="add-contact">
-						<aui:button value="add-contact" />
-					</div>
+					<button class="add-contact aui-buttonitem-content yui3-widget aui-component aui-buttonitem aui-state-default aui-buttonitem-icon-label" id="<portlet:namespace/>add-contact" type="button" value="add-contact">
+						<span class="aui-buttonitem-icon aui-icon aui-icon-add"></span>
+
+						<span class="aui-buttonitem-label"><liferay-ui:message key="add-contact" /></span>
+					</button>
 				</c:if>
 			</aui:layout>
 
@@ -543,7 +545,7 @@ portletURL.setWindowState(WindowState.NORMAL);
 						);
 					</c:when>
 					<c:otherwise>
-						A.one('.contacts-portlet .add-contact input').on(
+						A.one('#<portlet:namespace/>add-contact').on(
 							'click',
 							function(event) {
 								contactsCenter.showPopup('<%= LanguageUtil.get(pageContext, "add-contact") %>', '<portlet:renderURL windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="mvcPath" value="/contacts_center/edit_entry.jsp" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:renderURL>');

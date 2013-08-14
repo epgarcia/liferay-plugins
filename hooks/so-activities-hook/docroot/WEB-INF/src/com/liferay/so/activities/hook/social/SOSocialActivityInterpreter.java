@@ -35,6 +35,7 @@ import com.liferay.portlet.social.model.SocialActivity;
 import com.liferay.portlet.social.model.SocialActivityFeedEntry;
 import com.liferay.portlet.social.model.SocialActivitySet;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
+import com.liferay.so.activities.util.PortletPropsValues;
 
 import java.text.Format;
 
@@ -215,13 +216,15 @@ public abstract class SOSocialActivityInterpreter
 			activity.getClassName(), activity.getClassPK());
 
 		String body = StringUtil.shorten(
-			assetRenderer.getSummary(serviceContext.getLocale()), 200);
+			HtmlUtil.escape(
+				assetRenderer.getSearchSummary(
+					serviceContext.getLocale())), 200);
 
 		return new SocialActivityFeedEntry(title, body);
 	}
 
 	protected String getTitle(
-			long groupId, long userId, long createDate,
+			long groupId, long userId, long displayDate,
 			ServiceContext serviceContext)
 		throws Exception {
 
@@ -233,14 +236,14 @@ public abstract class SOSocialActivityInterpreter
 		Format dateFormatDate = getFormatDateTime(
 			serviceContext.getLocale(), serviceContext.getTimeZone());
 
-		Date activityDate = new Date(createDate);
+		Date activityDate = new Date(displayDate);
 
 		sb.append(dateFormatDate.format(activityDate));
 
 		sb.append("\">");
 
 		String relativeTimeDescription = Time.getRelativeTimeDescription(
-			createDate, serviceContext.getLocale(),
+			displayDate, serviceContext.getLocale(),
 			serviceContext.getTimeZone());
 
 		sb.append(relativeTimeDescription);
@@ -299,7 +302,7 @@ public abstract class SOSocialActivityInterpreter
 		sb.append(
 			getTitle(
 				activitySet.getGroupId(), activitySet.getUserId(),
-				activitySet.getCreateDate(), serviceContext));
+				activitySet.getModifiedDate(), serviceContext));
 		sb.append("<div class=\"activity-action\">");
 
 		String titlePattern = getTitlePattern(null, activitySet);
@@ -352,7 +355,11 @@ public abstract class SOSocialActivityInterpreter
 	protected boolean isExpired(SocialActivitySet activitySet) {
 		long age = System.currentTimeMillis() - activitySet.getCreateDate();
 
-		if (age > (Time.HOUR * 8)) {
+		long timeWindow =
+			Time.MINUTE *
+				PortletPropsValues.SOCIAL_ACTIVITY_SETS_BUNDLING_TIME_WINDOW;
+
+		if (age > timeWindow) {
 			return true;
 		}
 
