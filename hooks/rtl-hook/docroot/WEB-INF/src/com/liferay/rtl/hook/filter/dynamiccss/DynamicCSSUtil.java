@@ -141,9 +141,19 @@ public class DynamicCSSUtil {
 
 			parsedContent = StringUtil.read(
 				cacheResourceURLConnection.getInputStream());
+
+			if (_isThemeCssFastLoad(request, themeDisplay)) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Disabling the CSS fast load is unsupported. " +
+							"Serving CSS cache: " + cacheResourceURL.getPath());
+				}
+			}
 		}
 
 		if (Validator.isNull(parsedContent)) {
+			_log.error("Unable to serve CSS cache for " + resourcePath);
+
 			return content;
 		}
 
