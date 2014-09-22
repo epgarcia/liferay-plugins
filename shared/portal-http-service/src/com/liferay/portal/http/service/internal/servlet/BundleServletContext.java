@@ -178,7 +178,13 @@ public class BundleServletContext
 		super(servletContext);
 
 		_bundle = bundle;
-		_servletContextName = servletContextName;
+
+		if (servletContextName == null) {
+			_servletContextName = StringPool.BLANK;
+		}
+		else {
+			_servletContextName = servletContextName;
+		}
 
 		_httpContext = new DefaultHttpContext(_bundle);
 	}
@@ -238,51 +244,6 @@ public class BundleServletContext
 		return _bundle;
 	}
 
-	public BundleFilterChain getFilterChain(
-		String path, DispatcherType dispatcherType) {
-
-		BundleFilterChain bundleFilterChain = new BundleFilterChain();
-
-		for (FilterServiceRanking filterServiceRanking :
-			_filterServiceRankings) {
-
-			if (!matchDispatcherType(filterServiceRanking, dispatcherType)) {
-				continue;
-			}
-
-			String filterName = filterServiceRanking.getFilterName();
-
-			Filter filter = _filtersByFilterNames.get(filterName);
-
-			List<String> urlPatterns = filterServiceRanking.getUrlPatterns();
-
-			for (String urlPattern : urlPatterns) {
-				if (urlPattern.equals(path)) {
-					bundleFilterChain.addFilter(filter);
-
-					break;
-				}
-
-				if (urlPattern.contains(StringPool.STAR)) {
-					urlPattern = urlPattern.replaceAll(
-						"\\".concat(StringPool.STAR), ".*");
-				}
-
-				if (path.matches(urlPattern)) {
-					bundleFilterChain.addFilter(filter);
-				}
-			}
-		}
-
-		ExtensionMapping extensionMapping = getMatchingServletKey(path);
-
-		Servlet servlet = _servletsByURLPatterns.get(extensionMapping.getPath());
-
-		bundleFilterChain.setServlet(servlet);
-
-		return bundleFilterChain;
-	}
-
 	@Override
 	public ClassLoader getClassLoader() {
 		ClassLoader classLoader = (ClassLoader)_contextAttributes.get(
@@ -317,11 +278,62 @@ public class BundleServletContext
 		sb.append(PortalUtil.getPathContext());
 		sb.append(Portal.PATH_MODULE);
 		sb.append(StringPool.SLASH);
-		sb.append(getServletContextName());
+
+		String servletContextName = getServletContextName();
+
+		if (Validator.isNotNull(servletContextName)) {
+			sb.append(servletContextName);
+		}
 
 		_contextPath = sb.toString();
 
 		return _contextPath;
+	}
+
+	public BundleFilterChain getFilterChain(
+		String path, DispatcherType dispatcherType) {
+
+		BundleFilterChain bundleFilterChain = new BundleFilterChain();
+
+		for (FilterServiceRanking filterServiceRanking :
+				_filterServiceRankings) {
+
+			if (!matchDispatcherType(filterServiceRanking, dispatcherType)) {
+				continue;
+			}
+
+			String filterName = filterServiceRanking.getFilterName();
+
+			Filter filter = _filtersByFilterNames.get(filterName);
+
+			List<String> urlPatterns = filterServiceRanking.getUrlPatterns();
+
+			for (String urlPattern : urlPatterns) {
+				if (urlPattern.equals(path)) {
+					bundleFilterChain.addFilter(filter);
+
+					break;
+				}
+
+				if (urlPattern.contains(StringPool.STAR)) {
+					urlPattern = urlPattern.replaceAll(
+						"\\".concat(StringPool.STAR), ".*");
+				}
+
+				if (path.matches(urlPattern)) {
+					bundleFilterChain.addFilter(filter);
+				}
+			}
+		}
+
+		ExtensionMapping extensionMapping = getMatchingServletKey(path);
+
+		Servlet servlet = _servletsByURLPatterns.get(
+			extensionMapping.getPath());
+
+		bundleFilterChain.setServlet(servlet);
+
+		return bundleFilterChain;
 	}
 
 	public HttpContext getHttpContext() {
@@ -336,17 +348,6 @@ public class BundleServletContext
 	@Override
 	public Enumeration<String> getInitParameterNames() {
 		return Collections.enumeration(_initParameters.keySet());
-	}
-
-	@Override
-	public String getRealPath(String path) {
-		URL url = _httpContext.getResource(path);
-
-		if (url != null) {
-			return url.toExternalForm();
-		}
-
-		return path;
 	}
 
 	public ExtensionMapping getMatchingServletKey(String path) {
@@ -371,7 +372,7 @@ public class BundleServletContext
 				return new ExtensionMapping(false, alias);
 			}
 			else if (_servletsByURLPatterns.containsKey(
-				alias.concat(extension))) {
+						alias.concat(extension))) {
 
 				return new ExtensionMapping(true, alias.concat(extension));
 			}
@@ -380,10 +381,10 @@ public class BundleServletContext
 		}
 
 		if (_servletsByURLPatterns.containsKey(
-			StringPool.SLASH.concat(extension))) {
+				StringPool.SLASH.concat(extension))) {
 
 			return new ExtensionMapping(
-				extensionMapping,StringPool.SLASH.concat(extension));
+				extensionMapping, StringPool.SLASH.concat(extension));
 		}
 
 		if (_servletsByURLPatterns.containsKey(StringPool.SLASH)) {
@@ -391,6 +392,17 @@ public class BundleServletContext
 		}
 
 		return null;
+	}
+
+	@Override
+	public String getRealPath(String path) {
+		URL url = _httpContext.getResource(path);
+
+		if (url != null) {
+			return url.toExternalForm();
+		}
+
+		return path;
 	}
 
 	@Override
@@ -419,7 +431,7 @@ public class BundleServletContext
 			return null;
 		}
 
-		ExtensionMapping extensionMapping =  getMatchingServletKey(path);
+		ExtensionMapping extensionMapping = getMatchingServletKey(path);
 
 		if (extensionMapping != null) {
 			return new BundleRequestDispatcher(
@@ -497,8 +509,7 @@ public class BundleServletContext
 		properties.put("bundle.id", _bundle.getBundleId());
 		properties.put("bundle.symbolicName", _bundle.getSymbolicName());
 		properties.put("bundle.version", _bundle.getVersion());
-		properties.put(
-			"Web-ContextPath", StringPool.SLASH.concat(_servletContextName));
+		properties.put("Web-ContextPath", getContextPath());
 
 		BundleContext bundleContext = _bundle.getBundleContext();
 
@@ -636,7 +647,7 @@ public class BundleServletContext
 
 			if (listener instanceof HttpSessionAttributeListener) {
 				PortletSessionListenerManager.addHttpSessionAttributeListener(
-					(HttpSessionAttributeListener) listener);
+					(HttpSessionAttributeListener)listener);
 			}
 
 			if (listener instanceof HttpSessionBindingListener) {
@@ -706,9 +717,20 @@ public class BundleServletContext
 			registerServlet(
 				name, alias, resourceServlet, initParameters, httpContext);
 
-			AuthPublicPathRegistry.register(
-				Portal.PATH_MODULE + StringPool.SLASH + _servletContextName +
-					alias);
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(Portal.PATH_MODULE);
+			sb.append(StringPool.SLASH);
+
+			String servletContextName = getServletContextName();
+
+			if (Validator.isNotNull(servletContextName)) {
+				sb.append(servletContextName);
+			}
+
+			sb.append(alias);
+
+			AuthPublicPathRegistry.register(sb.toString());
 		}
 		catch (ServletException se) {
 			throw new IllegalArgumentException(se);
@@ -908,36 +930,40 @@ public class BundleServletContext
 		while (iterator.hasNext()) {
 			Map.Entry<String, Servlet> entry = iterator.next();
 
+			String alias = entry.getKey();
 			Servlet curServlet = entry.getValue();
 
 			if (curServlet != servlet) {
 				continue;
 			}
 
-			AuthPublicPathRegistry.unregister(
-				Portal.PATH_MODULE + StringPool.SLASH + _servletContextName +
-					entry.getKey());
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(Portal.PATH_MODULE);
+			sb.append(StringPool.SLASH);
+
+			String servletContextName = getServletContextName();
+
+			if (Validator.isNotNull(servletContextName)) {
+				sb.append(servletContextName);
+			}
+
+			sb.append(alias);
+
+			AuthPublicPathRegistry.unregister(alias);
 
 			iterator.remove();
 
 			if (_log.isInfoEnabled()) {
 				String urlPattern = entry.getKey();
 
-				_log.info(
-					"Unmapped servlet " + servletName + " from " + urlPattern);
+				_log.info("Unmapped servlet " + servletName + " from " + alias);
 			}
 		}
 
 		if (_log.isInfoEnabled()) {
 			_log.info("Unregistered servlet " + servletName);
 		}
-	}
-
-	protected boolean matchDispatcherType(
-		FilterServiceRanking filterServiceRanking,
-		DispatcherType dispatcherType) {
-
-		return filterServiceRanking.getDispatcherType().equals(dispatcherType);
 	}
 
 	protected DispatcherType getDispatcher(Map<String, String> parameters) {
@@ -967,7 +993,13 @@ public class BundleServletContext
 		File parentTempDir = (File)super.getAttribute(
 			JavaConstants.JAVAX_SERVLET_CONTEXT_TEMPDIR);
 
-		File tempDir = new File(parentTempDir, _servletContextName);
+		String fileName = getServletContextName();
+
+		if (Validator.isNull(fileName)) {
+			fileName = String.valueOf(_bundle.getBundleId());
+		}
+
+		File tempDir = new File(parentTempDir, fileName);
 
 		if (!tempDir.exists() && !tempDir.mkdirs()) {
 			throw new IllegalStateException(
@@ -991,6 +1023,13 @@ public class BundleServletContext
 		}
 
 		return true;
+	}
+
+	protected boolean matchDispatcherType(
+		FilterServiceRanking filterServiceRanking,
+		DispatcherType dispatcherType) {
+
+		return filterServiceRanking.getDispatcherType().equals(dispatcherType);
 	}
 
 	protected void unregisterFilterByServiceRanking(String filterName) {
@@ -1146,17 +1185,18 @@ public class BundleServletContext
 	private File _tempDir;
 
 	private class ExtensionMapping {
+
 		public ExtensionMapping(boolean extension, String path) {
 			_extension = extension;
 			_path = path;
 		}
 
-		public boolean isExtension() {
-			return _extension;
-		}
-
 		public String getPath() {
 			return _path;
+		}
+
+		public boolean isExtension() {
+			return _extension;
 		}
 
 		private boolean _extension;
@@ -1204,6 +1244,7 @@ public class BundleServletContext
 		public void setDispatcherType(DispatcherType dispatcherType) {
 			_dispatcherType = dispatcherType;
 		}
+
 		public void setFilterName(String filterName) {
 			_filterName = filterName;
 		}
