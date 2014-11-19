@@ -18,6 +18,7 @@ import com.liferay.knowledgebase.KBArticleImportException;
 import com.liferay.knowledgebase.admin.importer.util.KBArticleMarkdownConverter;
 import com.liferay.knowledgebase.model.KBArticle;
 import com.liferay.knowledgebase.model.KBArticleConstants;
+import com.liferay.knowledgebase.model.KBFolderConstants;
 import com.liferay.knowledgebase.service.KBArticleLocalServiceUtil;
 import com.liferay.knowledgebase.util.PortletPropsValues;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -33,6 +34,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.util.PortalUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,8 +55,8 @@ import java.util.TreeMap;
 public class KBArticleImporter {
 
 	public void processZipFile(
-			long userId, long groupId, InputStream inputStream,
-			ServiceContext serviceContext)
+			long userId, long groupId, long parentKBFolderId,
+			InputStream inputStream, ServiceContext serviceContext)
 		throws KBArticleImportException, SystemException {
 
 		if (inputStream == null) {
@@ -68,7 +70,8 @@ public class KBArticleImporter {
 			Map<String, String> metadata = getMetadata(zipReader);
 
 			processKBArticleFiles(
-				userId, groupId, zipReader, metadata, serviceContext);
+				userId, groupId, parentKBFolderId, zipReader, metadata,
+				serviceContext);
 		}
 		catch (IOException ioe) {
 			throw new KBArticleImportException(ioe);
@@ -76,7 +79,8 @@ public class KBArticleImporter {
 	}
 
 	protected KBArticle addKBArticleMarkdown(
-			long userId, long groupId, long parentResourcePrimaryKey,
+			long userId, long groupId, long parentKBFolderId,
+			long parentResourceClassNameId, long parentResourcePrimaryKey,
 			String markdown, String fileEntryName, ZipReader zipReader,
 			Map<String, String> metadata, ServiceContext serviceContext)
 		throws KBArticleImportException, SystemException {
@@ -93,12 +97,12 @@ public class KBArticleImporter {
 
 		KBArticle kbArticle =
 			KBArticleLocalServiceUtil.fetchKBArticleByUrlTitle(
-				groupId, urlTitle);
+				groupId, parentKBFolderId, urlTitle);
 
 		try {
 			if (kbArticle == null) {
 				kbArticle = KBArticleLocalServiceUtil.addKBArticle(
-					userId, parentResourcePrimaryKey,
+					userId, parentResourceClassNameId, parentResourcePrimaryKey,
 					kbArticleMarkdownConverter.getTitle(), urlTitle, markdown,
 					null, kbArticleMarkdownConverter.getSourceURL(), null, null,
 					serviceContext);
@@ -212,8 +216,9 @@ public class KBArticleImporter {
 	}
 
 	protected void processKBArticleFiles(
-			long userId, long groupId, ZipReader zipReader,
-			Map<String, String> metadata, ServiceContext serviceContext)
+			long userId, long groupId, long parentKBFolderId,
+			ZipReader zipReader, Map<String, String> metadata,
+			ServiceContext serviceContext)
 		throws KBArticleImportException, SystemException {
 
 		Map<String, List<String>> folderNameFileEntryNamesMap =
@@ -240,18 +245,23 @@ public class KBArticleImporter {
 				}
 			}
 
-			long parentResourcePrimaryKey =
-				KBArticleConstants.DEFAULT_PARENT_RESOURCE_PRIM_KEY;
+			long parentResourceClassNameId = PortalUtil.getClassNameId(
+				KBFolderConstants.getClassName());
+			long parentResourcePrimaryKey = parentKBFolderId;
 
+			long sectionResourceClassNameId = parentResourceClassNameId;
 			long sectionResourcePrimaryKey = parentResourcePrimaryKey;
 
 			if (Validator.isNotNull(sectionIntroFileEntryName)) {
 				KBArticle sectionIntroKBArticle = addKBArticleMarkdown(
-					userId, groupId, parentResourcePrimaryKey,
+					userId, groupId, parentKBFolderId,
+					sectionResourceClassNameId, sectionResourcePrimaryKey,
 					zipReader.getEntryAsString(sectionIntroFileEntryName),
 					sectionIntroFileEntryName, zipReader, metadata,
 					serviceContext);
 
+				sectionResourceClassNameId = PortalUtil.getClassNameId(
+					KBArticleConstants.getClassName());
 				sectionResourcePrimaryKey =
 					sectionIntroKBArticle.getResourcePrimKey();
 			}
@@ -269,14 +279,14 @@ public class KBArticleImporter {
 				}
 
 				addKBArticleMarkdown(
-					userId, groupId, sectionResourcePrimaryKey, sectionMarkdown,
-					sectionFileEntryName, zipReader, metadata, serviceContext);
+					userId, groupId, parentKBFolderId,
+					sectionResourceClassNameId, sectionResourcePrimaryKey,
+					sectionMarkdown, sectionFileEntryName, zipReader, metadata,
+					serviceContext);
 			}
 		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(KBArticleImporter.class);
-
-	private static String _METADATA_FILE_NAME = ".METADATA";
 
 }

@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.ServiceContext;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -65,30 +65,60 @@ public class KBCommentServiceImpl extends KBCommentServiceBaseImpl {
 			long groupId, int status, int start, int end)
 		throws PortalException, SystemException {
 
-		List<KBComment> kbComments = new ArrayList<KBComment>();
-
 		if (AdminPermission.contains(
-				getPermissionChecker(), groupId, ActionKeys.VIEW_KB_FEEDBACK)) {
+				getPermissionChecker(), groupId,
+				ActionKeys.VIEW_KB_SUGGESTIONS)) {
 
-			kbComments = kbCommentPersistence.findByG_S(
-				groupId, status, start, end);
+			return kbCommentPersistence.findByG_S(groupId, status, start, end);
 		}
 
-		return kbComments;
+		return Collections.emptyList();
+	}
+
+	@Override
+	public List<KBComment> getKBComments(
+			long groupId, String className, long classPK, int status, int start,
+			int end)
+		throws PortalException, SystemException {
+
+		if (AdminPermission.contains(
+				getPermissionChecker(), groupId,
+				ActionKeys.VIEW_KB_SUGGESTIONS)) {
+
+			return kbCommentLocalService.getKBComments(
+				className, classPK, status, start, end);
+		}
+
+		return Collections.emptyList();
 	}
 
 	public int getKBCommentsCount(long groupId, int status)
 		throws PortalException, SystemException {
 
-		int kbCommentsCount = 0;
-
 		if (AdminPermission.contains(
-				getPermissionChecker(), groupId, ActionKeys.VIEW_KB_FEEDBACK)) {
+				getPermissionChecker(), groupId,
+				ActionKeys.VIEW_KB_SUGGESTIONS)) {
 
-			kbCommentsCount = kbCommentPersistence.countByG_S(groupId, status);
+			return kbCommentPersistence.countByG_S(groupId, status);
 		}
 
-		return kbCommentsCount;
+		return 0;
+	}
+
+	@Override
+	public int getKBCommentsCount(
+			long groupId, String className, long classPK, int status)
+		throws PortalException, SystemException {
+
+		if (AdminPermission.contains(
+				getPermissionChecker(), groupId,
+				ActionKeys.VIEW_KB_SUGGESTIONS)) {
+
+			return kbCommentLocalService.getKBCommentsCount(
+				className, classPK, status);
+		}
+
+		return 0;
 	}
 
 	public KBComment updateKBComment(

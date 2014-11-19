@@ -63,18 +63,18 @@ import java.rmi.RemoteException;
  */
 public class KBArticleServiceSoap {
 	public static com.liferay.knowledgebase.model.KBArticleSoap addKBArticle(
-		java.lang.String portletId, long parentResourcePrimKey,
-		java.lang.String title, java.lang.String urlTitle,
-		java.lang.String content, java.lang.String description,
-		java.lang.String sourceURL, java.lang.String[] sections,
-		java.lang.String[] selectedFileNames,
+		java.lang.String portletId, long parentResourceClassNameId,
+		long parentResourcePrimKey, java.lang.String title,
+		java.lang.String urlTitle, java.lang.String content,
+		java.lang.String description, java.lang.String sourceURL,
+		java.lang.String[] sections, java.lang.String[] selectedFileNames,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			com.liferay.knowledgebase.model.KBArticle returnValue = KBArticleServiceUtil.addKBArticle(portletId,
-					parentResourcePrimKey, title, urlTitle, content,
-					description, sourceURL, sections, selectedFileNames,
-					serviceContext);
+					parentResourceClassNameId, parentResourcePrimKey, title,
+					urlTitle, content, description, sourceURL, sections,
+					selectedFileNames, serviceContext);
 
 			return com.liferay.knowledgebase.model.KBArticleSoap.toSoapModel(returnValue);
 		}
@@ -117,6 +117,21 @@ public class KBArticleServiceSoap {
 		try {
 			KBArticleServiceUtil.deleteTempAttachment(groupId, resourcePrimKey,
 				fileName, tempFolderName);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.knowledgebase.model.KBArticleSoap fetchLatestKBArticle(
+		long resourcePrimKey, int status) throws RemoteException {
+		try {
+			com.liferay.knowledgebase.model.KBArticle returnValue = KBArticleServiceUtil.fetchLatestKBArticle(resourcePrimKey,
+					status);
+
+			return com.liferay.knowledgebase.model.KBArticleSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -460,10 +475,11 @@ public class KBArticleServiceSoap {
 	}
 
 	public static void moveKBArticle(long resourcePrimKey,
-		long parentResourcePrimKey, double priority) throws RemoteException {
+		long parentResourceClassNameId, long parentResourcePrimKey,
+		double priority) throws RemoteException {
 		try {
 			KBArticleServiceUtil.moveKBArticle(resourcePrimKey,
-				parentResourcePrimKey, priority);
+				parentResourceClassNameId, parentResourcePrimKey, priority);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

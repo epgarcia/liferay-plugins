@@ -338,7 +338,8 @@ public class KBArticleLocalServiceUtil {
 	}
 
 	public static com.liferay.knowledgebase.model.KBArticle addKBArticle(
-		long userId, long parentResourcePrimKey, java.lang.String title,
+		long userId, long parentResourceClassNameId,
+		long parentResourcePrimKey, java.lang.String title,
 		java.lang.String urlTitle, java.lang.String content,
 		java.lang.String description, java.lang.String sourceURL,
 		java.lang.String[] sections, java.lang.String[] selectedFileNames,
@@ -346,9 +347,9 @@ public class KBArticleLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
-				   .addKBArticle(userId, parentResourcePrimKey, title,
-			urlTitle, content, description, sourceURL, sections,
-			selectedFileNames, serviceContext);
+				   .addKBArticle(userId, parentResourceClassNameId,
+			parentResourcePrimKey, title, urlTitle, content, description,
+			sourceURL, sections, selectedFileNames, serviceContext);
 	}
 
 	public static void addKBArticleResources(
@@ -389,13 +390,14 @@ public class KBArticleLocalServiceUtil {
 	}
 
 	public static void addKBArticlesMarkdown(long userId, long groupId,
-		java.lang.String fileName, java.io.InputStream inputStream,
+		long parentKbFolderId, java.lang.String fileName,
+		java.io.InputStream inputStream,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService()
-			.addKBArticlesMarkdown(userId, groupId, fileName, inputStream,
-			serviceContext);
+			.addKBArticlesMarkdown(userId, groupId, parentKbFolderId, fileName,
+			inputStream, serviceContext);
 	}
 
 	public static void addTempAttachment(long groupId, long userId,
@@ -414,6 +416,12 @@ public class KBArticleLocalServiceUtil {
 		getService().deleteGroupKBArticles(groupId);
 	}
 
+	public static void deleteKBArticles(long groupId, long parentResourcePrimKey)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().deleteKBArticles(groupId, parentResourcePrimKey);
+	}
+
 	public static void deleteKBArticles(long[] resourcePrimKeys)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -429,9 +437,18 @@ public class KBArticleLocalServiceUtil {
 	}
 
 	public static com.liferay.knowledgebase.model.KBArticle fetchKBArticleByUrlTitle(
-		long groupId, java.lang.String urlTitle)
+		long groupId, long kbFolderId, java.lang.String urlTitle)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().fetchKBArticleByUrlTitle(groupId, urlTitle);
+		return getService()
+				   .fetchKBArticleByUrlTitle(groupId, kbFolderId, urlTitle);
+	}
+
+	public static com.liferay.knowledgebase.model.KBArticle fetchKBArticleByUrlTitle(
+		long groupId, java.lang.String kbFolderUrlTitle,
+		java.lang.String urlTitle)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .fetchKBArticleByUrlTitle(groupId, kbFolderUrlTitle, urlTitle);
 	}
 
 	public static com.liferay.knowledgebase.model.KBArticle fetchLatestKBArticle(
@@ -441,10 +458,11 @@ public class KBArticleLocalServiceUtil {
 	}
 
 	public static com.liferay.knowledgebase.model.KBArticle fetchLatestKBArticleByUrlTitle(
-		long groupId, java.lang.String urlTitle, int status)
+		long groupId, long kbFolderId, java.lang.String urlTitle, int status)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
-				   .fetchLatestKBArticleByUrlTitle(groupId, urlTitle, status);
+				   .fetchLatestKBArticleByUrlTitle(groupId, kbFolderId,
+			urlTitle, status);
 	}
 
 	public static java.util.List<com.liferay.knowledgebase.model.KBArticle> getAllDescendantKBArticles(
@@ -515,10 +533,18 @@ public class KBArticleLocalServiceUtil {
 	}
 
 	public static com.liferay.knowledgebase.model.KBArticle getKBArticleByUrlTitle(
-		long groupId, java.lang.String urlTitle)
+		long groupId, long kbFolderId, java.lang.String urlTitle)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return getService().getKBArticleByUrlTitle(groupId, urlTitle);
+		return getService().getKBArticleByUrlTitle(groupId, kbFolderId, urlTitle);
+	}
+
+	public static com.liferay.knowledgebase.model.KBArticle getKBArticleByUrlTitle(
+		long groupId, java.lang.String kbFolderUrlTitle,
+		java.lang.String urlTitle)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .getKBArticleByUrlTitle(groupId, kbFolderUrlTitle, urlTitle);
 	}
 
 	public static java.util.List<com.liferay.knowledgebase.model.KBArticle> getKBArticles(
@@ -568,11 +594,12 @@ public class KBArticleLocalServiceUtil {
 	}
 
 	public static com.liferay.knowledgebase.model.KBArticle getLatestKBArticleByUrlTitle(
-		long groupId, java.lang.String urlTitle, int status)
+		long groupId, long kbFolderId, java.lang.String urlTitle, int status)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
-				   .getLatestKBArticleByUrlTitle(groupId, urlTitle, status);
+				   .getLatestKBArticleByUrlTitle(groupId, kbFolderId, urlTitle,
+			status);
 	}
 
 	public static com.liferay.knowledgebase.model.KBArticle[] getPreviousAndNextKBArticles(
@@ -634,12 +661,13 @@ public class KBArticleLocalServiceUtil {
 	}
 
 	public static void moveKBArticle(long userId, long resourcePrimKey,
-		long parentResourcePrimKey, double priority)
+		long parentResourceClassNameId, long parentResourcePrimKey,
+		double priority)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService()
-			.moveKBArticle(userId, resourcePrimKey, parentResourcePrimKey,
-			priority);
+			.moveKBArticle(userId, resourcePrimKey, parentResourceClassNameId,
+			parentResourcePrimKey, priority);
 	}
 
 	public static java.util.List<com.liferay.knowledgebase.model.KBArticle> search(

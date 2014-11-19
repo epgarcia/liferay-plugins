@@ -22,11 +22,15 @@ import com.liferay.knowledgebase.KBCommentContentException;
 import com.liferay.knowledgebase.NoSuchArticleException;
 import com.liferay.knowledgebase.NoSuchCommentException;
 import com.liferay.knowledgebase.model.KBArticle;
+import com.liferay.knowledgebase.model.KBArticleConstants;
 import com.liferay.knowledgebase.model.KBComment;
 import com.liferay.knowledgebase.model.KBCommentConstants;
+import com.liferay.knowledgebase.model.KBFolderConstants;
 import com.liferay.knowledgebase.service.KBArticleServiceUtil;
 import com.liferay.knowledgebase.service.KBCommentLocalServiceUtil;
 import com.liferay.knowledgebase.service.KBCommentServiceUtil;
+import com.liferay.knowledgebase.service.KBFolderServiceUtil;
+import com.liferay.knowledgebase.util.KnowledgeBaseConstants;
 import com.liferay.knowledgebase.util.WebKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -97,7 +101,7 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 
 			KBArticleServiceUtil.addTempAttachment(
 				themeDisplay.getScopeGroupId(), resourcePrimKey, sourceFileName,
-				_TEMP_FOLDER_NAME, inputStream, mimeType);
+				KnowledgeBaseConstants.TEMP_FOLDER_NAME, inputStream, mimeType);
 		}
 		finally {
 			StreamUtil.cleanUp(inputStream);
@@ -129,7 +133,7 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 
 		KBCommentServiceUtil.deleteKBComment(kbCommentId);
 
-		SessionMessages.add(actionRequest, "feedbackDeleted");
+		SessionMessages.add(actionRequest, "suggestionDeleted");
 	}
 
 	public void deleteTempAttachment(
@@ -148,7 +152,7 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 		try {
 			KBArticleServiceUtil.deleteTempAttachment(
 				themeDisplay.getScopeGroupId(), resourcePrimKey, fileName,
-				_TEMP_FOLDER_NAME);
+				KnowledgeBaseConstants.TEMP_FOLDER_NAME);
 
 			jsonObject.put("deleted", Boolean.TRUE);
 		}
@@ -163,19 +167,34 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 		writeJSON(actionRequest, actionResponse, jsonObject);
 	}
 
-	public void moveKBArticle(
+	public void moveKBObject(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
+		long resourceClassNameId = ParamUtil.getLong(
+			actionRequest, "resourceClassNameId");
 		long resourcePrimKey = ParamUtil.getLong(
 			actionRequest, "resourcePrimKey");
-
+		long parentResourceClassNameId = ParamUtil.getLong(
+			actionRequest, "parentResourceClassNameId",
+			PortalUtil.getClassNameId(KBFolderConstants.getClassName()));
 		long parentResourcePrimKey = ParamUtil.getLong(
-			actionRequest, "parentResourcePrimKey");
+			actionRequest, "parentResourcePrimKey",
+			KBFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 		double priority = ParamUtil.getDouble(actionRequest, "priority");
 
-		KBArticleServiceUtil.moveKBArticle(
-			resourcePrimKey, parentResourcePrimKey, priority);
+		long kbArticleClassNameId = PortalUtil.getClassNameId(
+			KBArticleConstants.getClassName());
+
+		if (resourceClassNameId == kbArticleClassNameId) {
+			KBArticleServiceUtil.moveKBArticle(
+				resourcePrimKey, parentResourceClassNameId,
+				parentResourcePrimKey, priority);
+		}
+		else {
+			KBFolderServiceUtil.moveKBFolder(
+				resourcePrimKey, parentResourcePrimKey);
+		}
 	}
 
 	public void serveAttachment(
@@ -283,9 +302,13 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 
 		long resourcePrimKey = ParamUtil.getLong(
 			actionRequest, "resourcePrimKey");
-
+		long parentResourceClassNameId = ParamUtil.getLong(
+			actionRequest, "parentResourceClassNameId",
+			PortalUtil.getClassNameId(KBFolderConstants.getClassName()));
 		long parentResourcePrimKey = ParamUtil.getLong(
-			actionRequest, "parentResourcePrimKey");
+			actionRequest, "parentResourcePrimKey",
+			KBFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
 		String title = ParamUtil.getString(actionRequest, "title");
 		String urlTitle = ParamUtil.getString(actionRequest, "urlTitle");
 		String content = ParamUtil.getString(actionRequest, "content");
@@ -306,9 +329,9 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 
 		if (cmd.equals(Constants.ADD)) {
 			kbArticle = KBArticleServiceUtil.addKBArticle(
-				portletId, parentResourcePrimKey, title, urlTitle, content,
-				description, sourceURL, sections, selectedFileNames,
-				serviceContext);
+				portletId, parentResourceClassNameId, parentResourcePrimKey,
+				title, urlTitle, content, description, sourceURL, sections,
+				selectedFileNames, serviceContext);
 		}
 		else if (cmd.equals(Constants.UPDATE)) {
 			kbArticle = KBArticleServiceUtil.updateKBArticle(
@@ -372,7 +395,7 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 				serviceContext);
 		}
 
-		SessionMessages.add(actionRequest, "feedbackSaved");
+		SessionMessages.add(actionRequest, "suggestionSaved");
 	}
 
 	public void updateKBCommentStatus(
@@ -388,7 +411,7 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 
 		KBCommentServiceUtil.updateStatus(kbCommentId, status, serviceContext);
 
-		SessionMessages.add(actionRequest, "feedbackStatusUpdated");
+		SessionMessages.add(actionRequest, "suggestionStatusUpdated");
 	}
 
 	protected String buildEditURL(
@@ -458,8 +481,5 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 
 		return false;
 	}
-
-	private static final String _TEMP_FOLDER_NAME =
-		BaseKBPortlet.class.getName();
 
 }

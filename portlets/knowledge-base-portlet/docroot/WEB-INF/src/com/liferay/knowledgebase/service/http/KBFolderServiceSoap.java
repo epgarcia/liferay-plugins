@@ -14,6 +14,13 @@
 
 package com.liferay.knowledgebase.service.http;
 
+import com.liferay.knowledgebase.service.KBFolderServiceUtil;
+
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+
+import java.rmi.RemoteException;
+
 /**
  * Provides the SOAP utility for the
  * {@link com.liferay.knowledgebase.service.KBFolderServiceUtil} service utility. The
@@ -55,4 +62,146 @@ package com.liferay.knowledgebase.service.http;
  * @generated
  */
 public class KBFolderServiceSoap {
+	public static com.liferay.knowledgebase.model.KBFolderSoap addKBFolder(
+		long groupId, long parentResourceClassNameId,
+		long parentResourcePrimKey, java.lang.String name,
+		java.lang.String description,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws RemoteException {
+		try {
+			com.liferay.knowledgebase.model.KBFolder returnValue = KBFolderServiceUtil.addKBFolder(groupId,
+					parentResourceClassNameId, parentResourcePrimKey, name,
+					description, serviceContext);
+
+			return com.liferay.knowledgebase.model.KBFolderSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.knowledgebase.model.KBFolderSoap deleteKBFolder(
+		long kbFolderId) throws RemoteException {
+		try {
+			com.liferay.knowledgebase.model.KBFolder returnValue = KBFolderServiceUtil.deleteKBFolder(kbFolderId);
+
+			return com.liferay.knowledgebase.model.KBFolderSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.knowledgebase.model.KBFolderSoap fetchKBFolderByUrlTitle(
+		long groupId, long parentKbFolderId, java.lang.String urlTitle)
+		throws RemoteException {
+		try {
+			com.liferay.knowledgebase.model.KBFolder returnValue = KBFolderServiceUtil.fetchKBFolderByUrlTitle(groupId,
+					parentKbFolderId, urlTitle);
+
+			return com.liferay.knowledgebase.model.KBFolderSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.knowledgebase.model.KBFolderSoap getKBFolder(
+		long kbFolderId) throws RemoteException {
+		try {
+			com.liferay.knowledgebase.model.KBFolder returnValue = KBFolderServiceUtil.getKBFolder(kbFolderId);
+
+			return com.liferay.knowledgebase.model.KBFolderSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.knowledgebase.model.KBFolderSoap getKBFolderByUrlTitle(
+		long groupId, long parentKbFolderId, java.lang.String urlTitle)
+		throws RemoteException {
+		try {
+			com.liferay.knowledgebase.model.KBFolder returnValue = KBFolderServiceUtil.getKBFolderByUrlTitle(groupId,
+					parentKbFolderId, urlTitle);
+
+			return com.liferay.knowledgebase.model.KBFolderSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.knowledgebase.model.KBFolderSoap[] getKBFolders(
+		long groupId, long parentKBFolderId, int start, int end)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.knowledgebase.model.KBFolder> returnValue =
+				KBFolderServiceUtil.getKBFolders(groupId, parentKBFolderId,
+					start, end);
+
+			return com.liferay.knowledgebase.model.KBFolderSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int getKBFoldersCount(long groupId, long parentKBFolderId)
+		throws RemoteException {
+		try {
+			int returnValue = KBFolderServiceUtil.getKBFoldersCount(groupId,
+					parentKBFolderId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void moveKBFolder(long kbFolderId, long parentKBFolderId)
+		throws RemoteException {
+		try {
+			KBFolderServiceUtil.moveKBFolder(kbFolderId, parentKBFolderId);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.knowledgebase.model.KBFolderSoap updateKBFolder(
+		long parentResourceClassNameId, long parentResourcePrimKey,
+		long kbFolderId, java.lang.String name, java.lang.String description)
+		throws RemoteException {
+		try {
+			com.liferay.knowledgebase.model.KBFolder returnValue = KBFolderServiceUtil.updateKBFolder(parentResourceClassNameId,
+					parentResourcePrimKey, kbFolderId, name, description);
+
+			return com.liferay.knowledgebase.model.KBFolderSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	private static Log _log = LogFactoryUtil.getLog(KBFolderServiceSoap.class);
 }

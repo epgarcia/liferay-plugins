@@ -16,8 +16,8 @@ package com.liferay.knowledgebase.service.impl;
 
 import com.liferay.knowledgebase.admin.util.AdminUtil;
 import com.liferay.knowledgebase.model.KBArticle;
-import com.liferay.knowledgebase.model.KBArticleConstants;
 import com.liferay.knowledgebase.model.KBArticleSearchDisplay;
+import com.liferay.knowledgebase.model.KBFolderConstants;
 import com.liferay.knowledgebase.model.impl.KBArticleSearchDisplayImpl;
 import com.liferay.knowledgebase.service.base.KBArticleServiceBaseImpl;
 import com.liferay.knowledgebase.service.permission.AdminPermission;
@@ -71,9 +71,10 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 
 	@Override
 	public KBArticle addKBArticle(
-			String portletId, long parentResourcePrimKey, String title,
-			String urlTitle, String content, String description,
-			String sourceURL, String[] sections, String[] selectedFileNames,
+			String portletId, long parentResourceClassNameId,
+			long parentResourcePrimKey, String title, String urlTitle,
+			String content, String description, String sourceURL,
+			String[] sections, String[] selectedFileNames,
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
@@ -89,22 +90,23 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 		}
 
 		return kbArticleLocalService.addKBArticle(
-			getUserId(), parentResourcePrimKey, title, urlTitle, content,
-			description, sourceURL, sections, selectedFileNames,
-			serviceContext);
+			getUserId(), parentResourceClassNameId, parentResourcePrimKey,
+			title, urlTitle, content, description, sourceURL, sections,
+			selectedFileNames, serviceContext);
 	}
 
 	@Override
 	public void addKBArticlesMarkdown(
-			long groupId, String fileName, InputStream inputStream,
-			ServiceContext serviceContext)
+			long groupId, long parentKBFolderId, String fileName,
+			InputStream inputStream, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		AdminPermission.check(
 			getPermissionChecker(), groupId, ActionKeys.ADD_KB_ARTICLE);
 
 		kbArticleLocalService.addKBArticlesMarkdown(
-			getUserId(), groupId, fileName, inputStream, serviceContext);
+			getUserId(), groupId, parentKBFolderId, fileName, inputStream,
+			serviceContext);
 	}
 
 	@Override
@@ -152,6 +154,23 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 
 		kbArticleLocalService.deleteTempAttachment(
 			groupId, getUserId(), fileName, tempFolderName);
+	}
+
+	@Override
+	public KBArticle fetchLatestKBArticle(long resourcePrimKey, int status)
+		throws PortalException, SystemException {
+
+		KBArticle kbArticle = kbArticleLocalService.fetchLatestKBArticle(
+			resourcePrimKey, status);
+
+		if (kbArticle == null) {
+			return null;
+		}
+
+		KBArticlePermission.check(
+			getPermissionChecker(), kbArticle, ActionKeys.VIEW);
+
+		return kbArticle;
 	}
 
 	@Override
@@ -552,18 +571,18 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 
 		if (status == WorkflowConstants.STATUS_ANY) {
 			return kbArticlePersistence.filterFindByG_P_S_L(
-				groupId, KBArticleConstants.DEFAULT_PARENT_RESOURCE_PRIM_KEY,
-				array, true, start, end, orderByComparator);
+				groupId, KBFolderConstants.DEFAULT_PARENT_FOLDER_ID, array,
+				true, start, end, orderByComparator);
 		}
 		else if (status == WorkflowConstants.STATUS_APPROVED) {
 			return kbArticlePersistence.filterFindByG_P_S_M(
-				groupId, KBArticleConstants.DEFAULT_PARENT_RESOURCE_PRIM_KEY,
-				array, true, start, end, orderByComparator);
+				groupId, KBFolderConstants.DEFAULT_PARENT_FOLDER_ID, array,
+				true, start, end, orderByComparator);
 		}
 
 		return kbArticlePersistence.filterFindByG_P_S_S(
-			groupId, KBArticleConstants.DEFAULT_PARENT_RESOURCE_PRIM_KEY, array,
-			status, start, end, orderByComparator);
+			groupId, KBFolderConstants.DEFAULT_PARENT_FOLDER_ID, array, status,
+			start, end, orderByComparator);
 	}
 
 	@Override
@@ -579,18 +598,17 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 
 		if (status == WorkflowConstants.STATUS_ANY) {
 			return kbArticlePersistence.filterCountByG_P_S_L(
-				groupId, KBArticleConstants.DEFAULT_PARENT_RESOURCE_PRIM_KEY,
-				array, true);
+				groupId, KBFolderConstants.DEFAULT_PARENT_FOLDER_ID, array,
+				true);
 		}
 		else if (status == WorkflowConstants.STATUS_APPROVED) {
 			return kbArticlePersistence.filterCountByG_P_S_M(
-				groupId, KBArticleConstants.DEFAULT_PARENT_RESOURCE_PRIM_KEY,
-				array, true);
+				groupId, KBFolderConstants.DEFAULT_PARENT_FOLDER_ID, array,
+				true);
 		}
 
 		return kbArticlePersistence.filterCountByG_P_S_S(
-			groupId, KBArticleConstants.DEFAULT_PARENT_RESOURCE_PRIM_KEY, array,
-			status);
+			groupId, KBFolderConstants.DEFAULT_PARENT_FOLDER_ID, array, status);
 	}
 
 	/**
@@ -631,7 +649,8 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 
 	@Override
 	public void moveKBArticle(
-			long resourcePrimKey, long parentResourcePrimKey, double priority)
+			long resourcePrimKey, long parentResourceClassNameId,
+			long parentResourcePrimKey, double priority)
 		throws PortalException, SystemException {
 
 		KBArticlePermission.check(
@@ -639,7 +658,8 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 			ActionKeys.MOVE_KB_ARTICLE);
 
 		kbArticleLocalService.moveKBArticle(
-			getUserId(), resourcePrimKey, parentResourcePrimKey, priority);
+			getUserId(), resourcePrimKey, parentResourceClassNameId,
+			parentResourcePrimKey, priority);
 	}
 
 	@Override

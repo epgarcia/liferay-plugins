@@ -60,6 +60,7 @@ public class KBFolderWrapper implements KBFolder, ModelWrapper<KBFolder> {
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("parentKBFolderId", getParentKBFolderId());
 		attributes.put("name", getName());
+		attributes.put("urlTitle", getUrlTitle());
 		attributes.put("description", getDescription());
 
 		return attributes;
@@ -125,6 +126,12 @@ public class KBFolderWrapper implements KBFolder, ModelWrapper<KBFolder> {
 
 		if (name != null) {
 			setName(name);
+		}
+
+		String urlTitle = (String)attributes.get("urlTitle");
+
+		if (urlTitle != null) {
+			setUrlTitle(urlTitle);
 		}
 
 		String description = (String)attributes.get("description");
@@ -377,6 +384,26 @@ public class KBFolderWrapper implements KBFolder, ModelWrapper<KBFolder> {
 	}
 
 	/**
+	* Returns the url title of this k b folder.
+	*
+	* @return the url title of this k b folder
+	*/
+	@Override
+	public java.lang.String getUrlTitle() {
+		return _kbFolder.getUrlTitle();
+	}
+
+	/**
+	* Sets the url title of this k b folder.
+	*
+	* @param urlTitle the url title of this k b folder
+	*/
+	@Override
+	public void setUrlTitle(java.lang.String urlTitle) {
+		_kbFolder.setUrlTitle(urlTitle);
+	}
+
+	/**
 	* Returns the description of this k b folder.
 	*
 	* @return the description of this k b folder
@@ -460,7 +487,7 @@ public class KBFolderWrapper implements KBFolder, ModelWrapper<KBFolder> {
 	}
 
 	@Override
-	public int compareTo(KBFolder kbFolder) {
+	public int compareTo(com.liferay.knowledgebase.model.KBFolder kbFolder) {
 		return _kbFolder.compareTo(kbFolder);
 	}
 
@@ -470,17 +497,17 @@ public class KBFolderWrapper implements KBFolder, ModelWrapper<KBFolder> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<KBFolder> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<com.liferay.knowledgebase.model.KBFolder> toCacheModel() {
 		return _kbFolder.toCacheModel();
 	}
 
 	@Override
-	public KBFolder toEscapedModel() {
+	public com.liferay.knowledgebase.model.KBFolder toEscapedModel() {
 		return new KBFolderWrapper(_kbFolder.toEscapedModel());
 	}
 
 	@Override
-	public KBFolder toUnescapedModel() {
+	public com.liferay.knowledgebase.model.KBFolder toUnescapedModel() {
 		return new KBFolderWrapper(_kbFolder.toUnescapedModel());
 	}
 
@@ -498,6 +525,25 @@ public class KBFolderWrapper implements KBFolder, ModelWrapper<KBFolder> {
 	public void persist()
 		throws com.liferay.portal.kernel.exception.SystemException {
 		_kbFolder.persist();
+	}
+
+	@Override
+	public long getClassNameId() {
+		return _kbFolder.getClassNameId();
+	}
+
+	@Override
+	public java.lang.String getParentTitle(java.util.Locale locale)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _kbFolder.getParentTitle(locale);
+	}
+
+	@Override
+	public boolean isEmpty()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _kbFolder.isEmpty();
 	}
 
 	@Override

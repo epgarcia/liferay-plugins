@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -44,6 +45,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
+import com.liferay.portal.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
 import java.io.Serializable;
@@ -1902,6 +1904,334 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 	}
 
 	/**
+	 * Returns all the k b folders that the user has permission to view where groupId = &#63; and parentKBFolderId = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @return the matching k b folders that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public List<KBFolder> filterFindByG_P(long groupId, long parentKBFolderId)
+		throws SystemException {
+		return filterFindByG_P(groupId, parentKBFolderId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the k b folders that the user has permission to view where groupId = &#63; and parentKBFolderId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.knowledgebase.model.impl.KBFolderModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @param start the lower bound of the range of k b folders
+	 * @param end the upper bound of the range of k b folders (not inclusive)
+	 * @return the range of matching k b folders that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public List<KBFolder> filterFindByG_P(long groupId, long parentKBFolderId,
+		int start, int end) throws SystemException {
+		return filterFindByG_P(groupId, parentKBFolderId, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the k b folders that the user has permissions to view where groupId = &#63; and parentKBFolderId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.knowledgebase.model.impl.KBFolderModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @param start the lower bound of the range of k b folders
+	 * @param end the upper bound of the range of k b folders (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching k b folders that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public List<KBFolder> filterFindByG_P(long groupId, long parentKBFolderId,
+		int start, int end, OrderByComparator orderByComparator)
+		throws SystemException {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return findByG_P(groupId, parentKBFolderId, start, end,
+				orderByComparator);
+		}
+
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			query = new StringBundler(4);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_KBFOLDER_WHERE);
+		}
+		else {
+			query.append(_FILTER_SQL_SELECT_KBFOLDER_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		query.append(_FINDER_COLUMN_G_P_GROUPID_2);
+
+		query.append(_FINDER_COLUMN_G_P_PARENTKBFOLDERID_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_KBFOLDER_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			if (getDB().isSupportsInlineDistinct()) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
+			}
+			else {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				query.append(KBFolderModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				query.append(KBFolderModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				KBFolder.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			if (getDB().isSupportsInlineDistinct()) {
+				q.addEntity(_FILTER_ENTITY_ALIAS, KBFolderImpl.class);
+			}
+			else {
+				q.addEntity(_FILTER_ENTITY_TABLE, KBFolderImpl.class);
+			}
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(groupId);
+
+			qPos.add(parentKBFolderId);
+
+			return (List<KBFolder>)QueryUtil.list(q, getDialect(), start, end);
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	/**
+	 * Returns the k b folders before and after the current k b folder in the ordered set of k b folders that the user has permission to view where groupId = &#63; and parentKBFolderId = &#63;.
+	 *
+	 * @param kbFolderId the primary key of the current k b folder
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next k b folder
+	 * @throws com.liferay.knowledgebase.NoSuchFolderException if a k b folder with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public KBFolder[] filterFindByG_P_PrevAndNext(long kbFolderId,
+		long groupId, long parentKBFolderId, OrderByComparator orderByComparator)
+		throws NoSuchFolderException, SystemException {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return findByG_P_PrevAndNext(kbFolderId, groupId, parentKBFolderId,
+				orderByComparator);
+		}
+
+		KBFolder kbFolder = findByPrimaryKey(kbFolderId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			KBFolder[] array = new KBFolderImpl[3];
+
+			array[0] = filterGetByG_P_PrevAndNext(session, kbFolder, groupId,
+					parentKBFolderId, orderByComparator, true);
+
+			array[1] = kbFolder;
+
+			array[2] = filterGetByG_P_PrevAndNext(session, kbFolder, groupId,
+					parentKBFolderId, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected KBFolder filterGetByG_P_PrevAndNext(Session session,
+		KBFolder kbFolder, long groupId, long parentKBFolderId,
+		OrderByComparator orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_KBFOLDER_WHERE);
+		}
+		else {
+			query.append(_FILTER_SQL_SELECT_KBFOLDER_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		query.append(_FINDER_COLUMN_G_P_GROUPID_2);
+
+		query.append(_FINDER_COLUMN_G_P_PARENTKBFOLDERID_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_KBFOLDER_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					query.append(_ORDER_BY_ENTITY_ALIAS);
+				}
+				else {
+					query.append(_ORDER_BY_ENTITY_TABLE);
+				}
+
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					query.append(_ORDER_BY_ENTITY_ALIAS);
+				}
+				else {
+					query.append(_ORDER_BY_ENTITY_TABLE);
+				}
+
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				query.append(KBFolderModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				query.append(KBFolderModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				KBFolder.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+
+		SQLQuery q = session.createSQLQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		if (getDB().isSupportsInlineDistinct()) {
+			q.addEntity(_FILTER_ENTITY_ALIAS, KBFolderImpl.class);
+		}
+		else {
+			q.addEntity(_FILTER_ENTITY_TABLE, KBFolderImpl.class);
+		}
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(groupId);
+
+		qPos.add(parentKBFolderId);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(kbFolder);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<KBFolder> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
 	 * Removes all the k b folders where groupId = &#63; and parentKBFolderId = &#63; from the database.
 	 *
 	 * @param groupId the group ID
@@ -1976,8 +2306,655 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 		return count.intValue();
 	}
 
+	/**
+	 * Returns the number of k b folders that the user has permission to view where groupId = &#63; and parentKBFolderId = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @return the number of matching k b folders that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public int filterCountByG_P(long groupId, long parentKBFolderId)
+		throws SystemException {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return countByG_P(groupId, parentKBFolderId);
+		}
+
+		StringBundler query = new StringBundler(3);
+
+		query.append(_FILTER_SQL_COUNT_KBFOLDER_WHERE);
+
+		query.append(_FINDER_COLUMN_G_P_GROUPID_2);
+
+		query.append(_FINDER_COLUMN_G_P_PARENTKBFOLDERID_2);
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				KBFolder.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(groupId);
+
+			qPos.add(parentKBFolderId);
+
+			Long count = (Long)q.uniqueResult();
+
+			return count.intValue();
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
 	private static final String _FINDER_COLUMN_G_P_GROUPID_2 = "kbFolder.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_PARENTKBFOLDERID_2 = "kbFolder.parentKBFolderId = ?";
+	public static final FinderPath FINDER_PATH_FETCH_BY_G_P_N = new FinderPath(KBFolderModelImpl.ENTITY_CACHE_ENABLED,
+			KBFolderModelImpl.FINDER_CACHE_ENABLED, KBFolderImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByG_P_N",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			},
+			KBFolderModelImpl.GROUPID_COLUMN_BITMASK |
+			KBFolderModelImpl.PARENTKBFOLDERID_COLUMN_BITMASK |
+			KBFolderModelImpl.NAME_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_G_P_N = new FinderPath(KBFolderModelImpl.ENTITY_CACHE_ENABLED,
+			KBFolderModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_P_N",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			});
+
+	/**
+	 * Returns the k b folder where groupId = &#63; and parentKBFolderId = &#63; and name = &#63; or throws a {@link com.liferay.knowledgebase.NoSuchFolderException} if it could not be found.
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @param name the name
+	 * @return the matching k b folder
+	 * @throws com.liferay.knowledgebase.NoSuchFolderException if a matching k b folder could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public KBFolder findByG_P_N(long groupId, long parentKBFolderId, String name)
+		throws NoSuchFolderException, SystemException {
+		KBFolder kbFolder = fetchByG_P_N(groupId, parentKBFolderId, name);
+
+		if (kbFolder == null) {
+			StringBundler msg = new StringBundler(8);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("groupId=");
+			msg.append(groupId);
+
+			msg.append(", parentKBFolderId=");
+			msg.append(parentKBFolderId);
+
+			msg.append(", name=");
+			msg.append(name);
+
+			msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+			if (_log.isWarnEnabled()) {
+				_log.warn(msg.toString());
+			}
+
+			throw new NoSuchFolderException(msg.toString());
+		}
+
+		return kbFolder;
+	}
+
+	/**
+	 * Returns the k b folder where groupId = &#63; and parentKBFolderId = &#63; and name = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @param name the name
+	 * @return the matching k b folder, or <code>null</code> if a matching k b folder could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public KBFolder fetchByG_P_N(long groupId, long parentKBFolderId,
+		String name) throws SystemException {
+		return fetchByG_P_N(groupId, parentKBFolderId, name, true);
+	}
+
+	/**
+	 * Returns the k b folder where groupId = &#63; and parentKBFolderId = &#63; and name = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @param name the name
+	 * @param retrieveFromCache whether to use the finder cache
+	 * @return the matching k b folder, or <code>null</code> if a matching k b folder could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public KBFolder fetchByG_P_N(long groupId, long parentKBFolderId,
+		String name, boolean retrieveFromCache) throws SystemException {
+		Object[] finderArgs = new Object[] { groupId, parentKBFolderId, name };
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_G_P_N,
+					finderArgs, this);
+		}
+
+		if (result instanceof KBFolder) {
+			KBFolder kbFolder = (KBFolder)result;
+
+			if ((groupId != kbFolder.getGroupId()) ||
+					(parentKBFolderId != kbFolder.getParentKBFolderId()) ||
+					!Validator.equals(name, kbFolder.getName())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(5);
+
+			query.append(_SQL_SELECT_KBFOLDER_WHERE);
+
+			query.append(_FINDER_COLUMN_G_P_N_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_P_N_PARENTKBFOLDERID_2);
+
+			boolean bindName = false;
+
+			if (name == null) {
+				query.append(_FINDER_COLUMN_G_P_N_NAME_1);
+			}
+			else if (name.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_G_P_N_NAME_3);
+			}
+			else {
+				bindName = true;
+
+				query.append(_FINDER_COLUMN_G_P_N_NAME_2);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(parentKBFolderId);
+
+				if (bindName) {
+					qPos.add(name);
+				}
+
+				List<KBFolder> list = q.list();
+
+				if (list.isEmpty()) {
+					FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_P_N,
+						finderArgs, list);
+				}
+				else {
+					if ((list.size() > 1) && _log.isWarnEnabled()) {
+						_log.warn(
+							"KBFolderPersistenceImpl.fetchByG_P_N(long, long, String, boolean) with parameters (" +
+							StringUtil.merge(finderArgs) +
+							") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+					}
+
+					KBFolder kbFolder = list.get(0);
+
+					result = kbFolder;
+
+					cacheResult(kbFolder);
+
+					if ((kbFolder.getGroupId() != groupId) ||
+							(kbFolder.getParentKBFolderId() != parentKBFolderId) ||
+							(kbFolder.getName() == null) ||
+							!kbFolder.getName().equals(name)) {
+						FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_P_N,
+							finderArgs, kbFolder);
+					}
+				}
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_G_P_N,
+					finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (KBFolder)result;
+		}
+	}
+
+	/**
+	 * Removes the k b folder where groupId = &#63; and parentKBFolderId = &#63; and name = &#63; from the database.
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @param name the name
+	 * @return the k b folder that was removed
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public KBFolder removeByG_P_N(long groupId, long parentKBFolderId,
+		String name) throws NoSuchFolderException, SystemException {
+		KBFolder kbFolder = findByG_P_N(groupId, parentKBFolderId, name);
+
+		return remove(kbFolder);
+	}
+
+	/**
+	 * Returns the number of k b folders where groupId = &#63; and parentKBFolderId = &#63; and name = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @param name the name
+	 * @return the number of matching k b folders
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public int countByG_P_N(long groupId, long parentKBFolderId, String name)
+		throws SystemException {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_P_N;
+
+		Object[] finderArgs = new Object[] { groupId, parentKBFolderId, name };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_COUNT_KBFOLDER_WHERE);
+
+			query.append(_FINDER_COLUMN_G_P_N_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_P_N_PARENTKBFOLDERID_2);
+
+			boolean bindName = false;
+
+			if (name == null) {
+				query.append(_FINDER_COLUMN_G_P_N_NAME_1);
+			}
+			else if (name.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_G_P_N_NAME_3);
+			}
+			else {
+				bindName = true;
+
+				query.append(_FINDER_COLUMN_G_P_N_NAME_2);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(parentKBFolderId);
+
+				if (bindName) {
+					qPos.add(name);
+				}
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_G_P_N_GROUPID_2 = "kbFolder.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_P_N_PARENTKBFOLDERID_2 = "kbFolder.parentKBFolderId = ? AND ";
+	private static final String _FINDER_COLUMN_G_P_N_NAME_1 = "kbFolder.name IS NULL";
+	private static final String _FINDER_COLUMN_G_P_N_NAME_2 = "kbFolder.name = ?";
+	private static final String _FINDER_COLUMN_G_P_N_NAME_3 = "(kbFolder.name IS NULL OR kbFolder.name = '')";
+	public static final FinderPath FINDER_PATH_FETCH_BY_G_P_UT = new FinderPath(KBFolderModelImpl.ENTITY_CACHE_ENABLED,
+			KBFolderModelImpl.FINDER_CACHE_ENABLED, KBFolderImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByG_P_UT",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			},
+			KBFolderModelImpl.GROUPID_COLUMN_BITMASK |
+			KBFolderModelImpl.PARENTKBFOLDERID_COLUMN_BITMASK |
+			KBFolderModelImpl.URLTITLE_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_G_P_UT = new FinderPath(KBFolderModelImpl.ENTITY_CACHE_ENABLED,
+			KBFolderModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_P_UT",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			});
+
+	/**
+	 * Returns the k b folder where groupId = &#63; and parentKBFolderId = &#63; and urlTitle = &#63; or throws a {@link com.liferay.knowledgebase.NoSuchFolderException} if it could not be found.
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @param urlTitle the url title
+	 * @return the matching k b folder
+	 * @throws com.liferay.knowledgebase.NoSuchFolderException if a matching k b folder could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public KBFolder findByG_P_UT(long groupId, long parentKBFolderId,
+		String urlTitle) throws NoSuchFolderException, SystemException {
+		KBFolder kbFolder = fetchByG_P_UT(groupId, parentKBFolderId, urlTitle);
+
+		if (kbFolder == null) {
+			StringBundler msg = new StringBundler(8);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("groupId=");
+			msg.append(groupId);
+
+			msg.append(", parentKBFolderId=");
+			msg.append(parentKBFolderId);
+
+			msg.append(", urlTitle=");
+			msg.append(urlTitle);
+
+			msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+			if (_log.isWarnEnabled()) {
+				_log.warn(msg.toString());
+			}
+
+			throw new NoSuchFolderException(msg.toString());
+		}
+
+		return kbFolder;
+	}
+
+	/**
+	 * Returns the k b folder where groupId = &#63; and parentKBFolderId = &#63; and urlTitle = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @param urlTitle the url title
+	 * @return the matching k b folder, or <code>null</code> if a matching k b folder could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public KBFolder fetchByG_P_UT(long groupId, long parentKBFolderId,
+		String urlTitle) throws SystemException {
+		return fetchByG_P_UT(groupId, parentKBFolderId, urlTitle, true);
+	}
+
+	/**
+	 * Returns the k b folder where groupId = &#63; and parentKBFolderId = &#63; and urlTitle = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @param urlTitle the url title
+	 * @param retrieveFromCache whether to use the finder cache
+	 * @return the matching k b folder, or <code>null</code> if a matching k b folder could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public KBFolder fetchByG_P_UT(long groupId, long parentKBFolderId,
+		String urlTitle, boolean retrieveFromCache) throws SystemException {
+		Object[] finderArgs = new Object[] { groupId, parentKBFolderId, urlTitle };
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_G_P_UT,
+					finderArgs, this);
+		}
+
+		if (result instanceof KBFolder) {
+			KBFolder kbFolder = (KBFolder)result;
+
+			if ((groupId != kbFolder.getGroupId()) ||
+					(parentKBFolderId != kbFolder.getParentKBFolderId()) ||
+					!Validator.equals(urlTitle, kbFolder.getUrlTitle())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(5);
+
+			query.append(_SQL_SELECT_KBFOLDER_WHERE);
+
+			query.append(_FINDER_COLUMN_G_P_UT_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_P_UT_PARENTKBFOLDERID_2);
+
+			boolean bindUrlTitle = false;
+
+			if (urlTitle == null) {
+				query.append(_FINDER_COLUMN_G_P_UT_URLTITLE_1);
+			}
+			else if (urlTitle.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_G_P_UT_URLTITLE_3);
+			}
+			else {
+				bindUrlTitle = true;
+
+				query.append(_FINDER_COLUMN_G_P_UT_URLTITLE_2);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(parentKBFolderId);
+
+				if (bindUrlTitle) {
+					qPos.add(urlTitle);
+				}
+
+				List<KBFolder> list = q.list();
+
+				if (list.isEmpty()) {
+					FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_P_UT,
+						finderArgs, list);
+				}
+				else {
+					if ((list.size() > 1) && _log.isWarnEnabled()) {
+						_log.warn(
+							"KBFolderPersistenceImpl.fetchByG_P_UT(long, long, String, boolean) with parameters (" +
+							StringUtil.merge(finderArgs) +
+							") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+					}
+
+					KBFolder kbFolder = list.get(0);
+
+					result = kbFolder;
+
+					cacheResult(kbFolder);
+
+					if ((kbFolder.getGroupId() != groupId) ||
+							(kbFolder.getParentKBFolderId() != parentKBFolderId) ||
+							(kbFolder.getUrlTitle() == null) ||
+							!kbFolder.getUrlTitle().equals(urlTitle)) {
+						FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_P_UT,
+							finderArgs, kbFolder);
+					}
+				}
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_G_P_UT,
+					finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (KBFolder)result;
+		}
+	}
+
+	/**
+	 * Removes the k b folder where groupId = &#63; and parentKBFolderId = &#63; and urlTitle = &#63; from the database.
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @param urlTitle the url title
+	 * @return the k b folder that was removed
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public KBFolder removeByG_P_UT(long groupId, long parentKBFolderId,
+		String urlTitle) throws NoSuchFolderException, SystemException {
+		KBFolder kbFolder = findByG_P_UT(groupId, parentKBFolderId, urlTitle);
+
+		return remove(kbFolder);
+	}
+
+	/**
+	 * Returns the number of k b folders where groupId = &#63; and parentKBFolderId = &#63; and urlTitle = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param parentKBFolderId the parent k b folder ID
+	 * @param urlTitle the url title
+	 * @return the number of matching k b folders
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public int countByG_P_UT(long groupId, long parentKBFolderId,
+		String urlTitle) throws SystemException {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_P_UT;
+
+		Object[] finderArgs = new Object[] { groupId, parentKBFolderId, urlTitle };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_COUNT_KBFOLDER_WHERE);
+
+			query.append(_FINDER_COLUMN_G_P_UT_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_P_UT_PARENTKBFOLDERID_2);
+
+			boolean bindUrlTitle = false;
+
+			if (urlTitle == null) {
+				query.append(_FINDER_COLUMN_G_P_UT_URLTITLE_1);
+			}
+			else if (urlTitle.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_G_P_UT_URLTITLE_3);
+			}
+			else {
+				bindUrlTitle = true;
+
+				query.append(_FINDER_COLUMN_G_P_UT_URLTITLE_2);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(parentKBFolderId);
+
+				if (bindUrlTitle) {
+					qPos.add(urlTitle);
+				}
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_G_P_UT_GROUPID_2 = "kbFolder.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_P_UT_PARENTKBFOLDERID_2 = "kbFolder.parentKBFolderId = ? AND ";
+	private static final String _FINDER_COLUMN_G_P_UT_URLTITLE_1 = "kbFolder.urlTitle IS NULL";
+	private static final String _FINDER_COLUMN_G_P_UT_URLTITLE_2 = "kbFolder.urlTitle = ?";
+	private static final String _FINDER_COLUMN_G_P_UT_URLTITLE_3 = "(kbFolder.urlTitle IS NULL OR kbFolder.urlTitle = '')";
 
 	public KBFolderPersistenceImpl() {
 		setModelClass(KBFolder.class);
@@ -1995,6 +2972,18 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 
 		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_G,
 			new Object[] { kbFolder.getUuid(), kbFolder.getGroupId() }, kbFolder);
+
+		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_P_N,
+			new Object[] {
+				kbFolder.getGroupId(), kbFolder.getParentKBFolderId(),
+				kbFolder.getName()
+			}, kbFolder);
+
+		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_P_UT,
+			new Object[] {
+				kbFolder.getGroupId(), kbFolder.getParentKBFolderId(),
+				kbFolder.getUrlTitle()
+			}, kbFolder);
 
 		kbFolder.resetOriginalValues();
 	}
@@ -2079,6 +3068,25 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 				Long.valueOf(1));
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
 				kbFolder);
+
+			args = new Object[] {
+					kbFolder.getGroupId(), kbFolder.getParentKBFolderId(),
+					kbFolder.getName()
+				};
+
+			FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_G_P_N, args,
+				Long.valueOf(1));
+			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_P_N, args, kbFolder);
+
+			args = new Object[] {
+					kbFolder.getGroupId(), kbFolder.getParentKBFolderId(),
+					kbFolder.getUrlTitle()
+				};
+
+			FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_G_P_UT, args,
+				Long.valueOf(1));
+			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_P_UT, args,
+				kbFolder);
 		}
 		else {
 			KBFolderModelImpl kbFolderModelImpl = (KBFolderModelImpl)kbFolder;
@@ -2092,6 +3100,32 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
 					Long.valueOf(1));
 				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+					kbFolder);
+			}
+
+			if ((kbFolderModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_G_P_N.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						kbFolder.getGroupId(), kbFolder.getParentKBFolderId(),
+						kbFolder.getName()
+					};
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_G_P_N, args,
+					Long.valueOf(1));
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_P_N, args,
+					kbFolder);
+			}
+
+			if ((kbFolderModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_G_P_UT.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						kbFolder.getGroupId(), kbFolder.getParentKBFolderId(),
+						kbFolder.getUrlTitle()
+					};
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_G_P_UT, args,
+					Long.valueOf(1));
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_P_UT, args,
 					kbFolder);
 			}
 		}
@@ -2114,6 +3148,46 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 
 			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		args = new Object[] {
+				kbFolder.getGroupId(), kbFolder.getParentKBFolderId(),
+				kbFolder.getName()
+			};
+
+		FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_P_N, args);
+		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_G_P_N, args);
+
+		if ((kbFolderModelImpl.getColumnBitmask() &
+				FINDER_PATH_FETCH_BY_G_P_N.getColumnBitmask()) != 0) {
+			args = new Object[] {
+					kbFolderModelImpl.getOriginalGroupId(),
+					kbFolderModelImpl.getOriginalParentKBFolderId(),
+					kbFolderModelImpl.getOriginalName()
+				};
+
+			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_P_N, args);
+			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_G_P_N, args);
+		}
+
+		args = new Object[] {
+				kbFolder.getGroupId(), kbFolder.getParentKBFolderId(),
+				kbFolder.getUrlTitle()
+			};
+
+		FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_P_UT, args);
+		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_G_P_UT, args);
+
+		if ((kbFolderModelImpl.getColumnBitmask() &
+				FINDER_PATH_FETCH_BY_G_P_UT.getColumnBitmask()) != 0) {
+			args = new Object[] {
+					kbFolderModelImpl.getOriginalGroupId(),
+					kbFolderModelImpl.getOriginalParentKBFolderId(),
+					kbFolderModelImpl.getOriginalUrlTitle()
+				};
+
+			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_P_UT, args);
+			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_G_P_UT, args);
 		}
 	}
 
@@ -2355,6 +3429,7 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 		kbFolderImpl.setModifiedDate(kbFolder.getModifiedDate());
 		kbFolderImpl.setParentKBFolderId(kbFolder.getParentKBFolderId());
 		kbFolderImpl.setName(kbFolder.getName());
+		kbFolderImpl.setUrlTitle(kbFolder.getUrlTitle());
 		kbFolderImpl.setDescription(kbFolder.getDescription());
 
 		return kbFolderImpl;
@@ -2672,7 +3747,17 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 	private static final String _SQL_SELECT_KBFOLDER_WHERE = "SELECT kbFolder FROM KBFolder kbFolder WHERE ";
 	private static final String _SQL_COUNT_KBFOLDER = "SELECT COUNT(kbFolder) FROM KBFolder kbFolder";
 	private static final String _SQL_COUNT_KBFOLDER_WHERE = "SELECT COUNT(kbFolder) FROM KBFolder kbFolder WHERE ";
+	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "kbFolder.kbFolderId";
+	private static final String _FILTER_SQL_SELECT_KBFOLDER_WHERE = "SELECT DISTINCT {kbFolder.*} FROM KBFolder kbFolder WHERE ";
+	private static final String _FILTER_SQL_SELECT_KBFOLDER_NO_INLINE_DISTINCT_WHERE_1 =
+		"SELECT {KBFolder.*} FROM (SELECT DISTINCT kbFolder.kbFolderId FROM KBFolder kbFolder WHERE ";
+	private static final String _FILTER_SQL_SELECT_KBFOLDER_NO_INLINE_DISTINCT_WHERE_2 =
+		") TEMP_TABLE INNER JOIN KBFolder ON TEMP_TABLE.kbFolderId = KBFolder.kbFolderId";
+	private static final String _FILTER_SQL_COUNT_KBFOLDER_WHERE = "SELECT COUNT(DISTINCT kbFolder.kbFolderId) AS COUNT_VALUE FROM KBFolder kbFolder WHERE ";
+	private static final String _FILTER_ENTITY_ALIAS = "kbFolder";
+	private static final String _FILTER_ENTITY_TABLE = "KBFolder";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "kbFolder.";
+	private static final String _ORDER_BY_ENTITY_TABLE = "KBFolder.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No KBFolder exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No KBFolder exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = GetterUtil.getBoolean(PropsUtil.get(
