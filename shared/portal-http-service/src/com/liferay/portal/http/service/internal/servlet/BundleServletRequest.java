@@ -112,9 +112,7 @@ public class BundleServletRequest extends HttpServletRequestWrapper {
 
 	@Override
 	public String getRequestURI() {
-		String contextPath = getContextPath();
-
-		return contextPath.concat(_bundleRequestDispatcher.getRequestURI());
+		return _bundleRequestDispatcher.getRequestURI();
 	}
 
 	@Override

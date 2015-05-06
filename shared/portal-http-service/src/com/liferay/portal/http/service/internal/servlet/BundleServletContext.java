@@ -275,7 +275,6 @@ public class BundleServletContext
 			sb.append(contextPath);
 		}
 
-		sb.append(PortalUtil.getPathContext());
 		sb.append(Portal.PATH_MODULE);
 		sb.append(StringPool.SLASH);
 
