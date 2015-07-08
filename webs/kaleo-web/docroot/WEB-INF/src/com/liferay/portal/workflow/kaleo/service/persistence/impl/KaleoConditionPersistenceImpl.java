@@ -1996,6 +1996,11 @@ public class KaleoConditionPersistenceImpl extends BasePersistenceImpl<KaleoCond
 		return count.intValue();
 	}
 
+	@Override
+	protected Map<String, Integer> getTableColumnsMap() {
+		return KaleoConditionModelImpl.TABLE_COLUMNS_MAP;
+	}
+
 	/**
 	 * Initializes the kaleo condition persistence.
 	 */

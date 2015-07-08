@@ -1945,6 +1945,11 @@ public class KaleoTimerPersistenceImpl extends BasePersistenceImpl<KaleoTimer>
 		return count.intValue();
 	}
 
+	@Override
+	protected Map<String, Integer> getTableColumnsMap() {
+		return KaleoTimerModelImpl.TABLE_COLUMNS_MAP;
+	}
+
 	/**
 	 * Initializes the kaleo timer persistence.
 	 */

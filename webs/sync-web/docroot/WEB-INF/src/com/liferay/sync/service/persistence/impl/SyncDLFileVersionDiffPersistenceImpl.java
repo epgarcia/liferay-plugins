@@ -2060,6 +2060,11 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		return _badColumnNames;
 	}
 
+	@Override
+	protected Map<String, Integer> getTableColumnsMap() {
+		return SyncDLFileVersionDiffModelImpl.TABLE_COLUMNS_MAP;
+	}
+
 	/**
 	 * Initializes the sync d l file version diff persistence.
 	 */

@@ -48,6 +48,8 @@
 	<property name="app.server.classes.portal.dir" value="${app.server.portal.dir}/WEB-INF/classes" />
 	<property location="${app.server.portal.dir}/WEB-INF/lib" name="app.server.lib.portal.dir" />
 
+	<dirname file="${ivy.home}" property="ivy.home.dir" />
+
 	<if>
 		<not>
 			<equals arg1="${junit.debug}" arg2="true" />
@@ -57,9 +59,13 @@
 		</then>
 	</if>
 
+	<property name="sdk.tools.dir" value="${ivy.home.dir}/tools" />
+
 	<property name="whip.agent" value="-javaagent:${sdk.dir}/dependencies/com.liferay.whip/lib/com.liferay.whip.jar=${junit.whip.includes};${junit.whip.excludes}" />
 
 	<import file="build-common-ivy.xml" />
+
+	<import file="build-common-node.xml" />
 
 	<path id="plugin.classpath">
 		<path refid="plugin-lib.classpath" />
@@ -514,6 +520,7 @@ Error-Prone was automatically installed. Please rerun your task.
 				</then>
 			</if>
 
+			<delete dir="@{module.dir}/.js-cache" />
 			<delete dir="@{module.dir}/coverage-reports" />
 			<delete dir="@{module.dir}/javadoc" />
 			<delete dir="@{module.dir}/pmd-reports" />
@@ -1328,11 +1335,15 @@ Please find a solution that does not require portal-impl.jar.
 									<globmapper from="META-INF/resources/html/*" to="html/*" />
 								</mapper>
 							</unzip>
+
+							<touch>
+								<fileset dir="${frontend.themes.web.dir}" />
+							</touch>
 						</then>
 					</if>
 				</then>
 				<else>
-					<fail>The module com.liferay.frotnend.themes.web.jar does not exist.</fail>
+					<fail>The module com.liferay.frontend.themes.web.jar does not exist.</fail>
 				</else>
 			</if>
 
@@ -1891,7 +1902,7 @@ Please find a solution that does not require portal-impl.jar.
 				</then>
 				<else>
 					<if>
-						<matches pattern=".*-test" string="@{module.dir}" />
+						<matches pattern=".*-test$" string="@{module.dir}" />
 						<then>
 							<loop-macrodef-or-target
 								module.dirs="@{module.dir}"
@@ -1964,6 +1975,21 @@ Please find a solution that does not require portal-impl.jar.
 											<build-css
 												module.dir="@{module.dir}"
 												sass.docroot.dir="${module.dir.unix}/src/META-INF/resources"
+											/>
+										</then>
+									</if>
+
+									<if>
+										<and>
+											<available file="@{module.dir}/bower.json" />
+											<available file="@{module.dir}/src/META-INF/resources" />
+											<resourcecount count="0" when="gt">
+												<fileset dir="@{module.dir}/src/META-INF/resources" includes="**/${transpile.file.pattern},${transpile.file.pattern}" />
+											</resourcecount>
+										</and>
+										<then>
+											<transpile-js
+												module.dir="@{module.dir}"
 											/>
 										</then>
 									</if>
@@ -2077,6 +2103,13 @@ Please find a solution that does not require portal-impl.jar.
 													<if>
 														<available file="${temp.deployed.plugin.dir}" />
 														<then>
+															<touch millis="0">
+																<fileset
+																	dir="${temp.deployed.plugin.dir}"
+																	includes="WEB-INF/liferay-web.xml,WEB-INF/web.xml,WEB-INF/tld/*"
+																/>
+															</touch>
+
 															<jar destfile="${sdk.dir}/dist/${plugin.name}-${plugin.full.version}.war" duplicate="preserve" update="true">
 																<fileset
 																	dir="${app.server.portal.dir}"
@@ -2718,7 +2751,7 @@ Please find a solution that does not require portal-impl.jar.
 				<available file="@{module.dir}/test/integration" type="dir" />
 				<then>
 					<resourcecount property="test.integration.count">
-						<fileset dir="@{module.dir}/test-classes/integration" includes="**/@{test.class}.class" />
+						<fileset dir="@{module.dir}/test/integration" includes="**/@{test.class}.java" />
 					</resourcecount>
 				</then>
 			</if>
@@ -2727,7 +2760,7 @@ Please find a solution that does not require portal-impl.jar.
 				<available file="@{module.dir}/test/unit" type="dir" />
 				<then>
 					<resourcecount property="test.unit.count">
-						<fileset dir="@{module.dir}/test-classes/unit" includes="**/@{test.class}.class" />
+						<fileset dir="@{module.dir}/test/unit" includes="**/@{test.class}.java" />
 					</resourcecount>
 				</then>
 			</if>

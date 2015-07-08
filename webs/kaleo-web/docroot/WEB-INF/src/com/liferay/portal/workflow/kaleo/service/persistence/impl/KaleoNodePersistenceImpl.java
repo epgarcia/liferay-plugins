@@ -2255,6 +2255,11 @@ public class KaleoNodePersistenceImpl extends BasePersistenceImpl<KaleoNode>
 		return _badColumnNames;
 	}
 
+	@Override
+	protected Map<String, Integer> getTableColumnsMap() {
+		return KaleoNodeModelImpl.TABLE_COLUMNS_MAP;
+	}
+
 	/**
 	 * Initializes the kaleo node persistence.
 	 */

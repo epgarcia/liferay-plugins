@@ -2292,6 +2292,11 @@ public class KaleoNotificationRecipientPersistenceImpl
 		return count.intValue();
 	}
 
+	@Override
+	protected Map<String, Integer> getTableColumnsMap() {
+		return KaleoNotificationRecipientModelImpl.TABLE_COLUMNS_MAP;
+	}
+
 	/**
 	 * Initializes the kaleo notification recipient persistence.
 	 */
